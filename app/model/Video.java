@@ -4,16 +4,18 @@ public class Video {
     private String videoId;
     private String title;
     private String description;
+    private String imageUrl;
     private String channelId;
     private String channelTitle;
 
     public Video() {
     }
 
-    public Video(String videoId, String title, String description, String channelId, String channelTitle) {
+    public Video(String videoId, String title, String description, String imageUrl, String channelId, String channelTitle) {
         this.videoId = videoId;
         this.title = title;
         this.description = description;
+        this.imageUrl = imageUrl;
         this.channelId = channelId;
         this.channelTitle = channelTitle;
     }
@@ -40,6 +42,14 @@ public class Video {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public String getChannelId() {

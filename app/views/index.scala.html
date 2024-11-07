@@ -1,24 +1,54 @@
-@()
+@import model.SearchForm
+@import play.mvc.Http.Request
+@(searchForm: Form[SearchForm])(implicit request: Request)
 
 @main("Welcome to Play") {
-<!--  <h1>Welcome to Play!</h1>-->
+    <!--  <h1>Welcome to Play!</h1>-->
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YT Lytics</title>
-  <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")">
-</head>
-<body>
-<div class="container">
-  <h1>Welcome to YT lytics</h1>
-  <div class="search-bar">
-    <input type="text" placeholder="Enter search terms">
-    <button>Go!</button>
-  </div>
-</div>
-</body>
-</html>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>YT Lytics</title>
+            <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")">
+        </head>
+        <body>
+            <div class="container">
+                <h1>Welcome to YT lytics</h1>
+                @helper.form(routes.YouTubeController.search) {
+                    @helper.CSRF.formField
+                    <div class="search-bar">
+                        <input type="text" name="query" placeholder="Enter search terms">
+                        <button type="submit">Go!</button>
+                    </div>
+                }
+            </div>
+
+            <div id="resultsContainer">
+                <h2>Search Results:</h2>
+            </div>
+
+            <script>
+                    $(document).ready(function () {
+                        $('form').on('submit', function (event) {
+                            event.preventDefault();
+                            $.ajax({
+                                url: $(this).attr('action'),
+                                type: 'POST',
+                                data: $(this).serialize(),
+                                headers: {'Csrf-Token': $('input[name="csrfToken"]').val()}, // Set CSRF header
+                                success: function (response) {
+                                    response = JSON.stringify(response);
+                                    $('#resultsContainer').append('<p>' + response + '</p>');
+                                },
+                                error: function () {
+                                    alert("Error submitting data.");
+                                }
+                            });
+                        })
+                    })
+            </script>
+        </body>
+    </html>
 
 }

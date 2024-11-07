@@ -1,8 +1,7 @@
 package services.impl;
 
-import akka.NotUsed;
-import akka.stream.javadsl.Source;
 import com.fasterxml.jackson.databind.JsonNode;
+import model.Response;
 import model.Video;
 import play.libs.ws.WSClient;
 import play.libs.ws.WSRequest;
@@ -10,7 +9,6 @@ import play.libs.ws.WSResponse;
 import services.YouTubeService;
 
 import javax.inject.Inject;
-import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -29,7 +27,7 @@ public class YouTubeServiceImpl implements YouTubeService {
     }
 
     @Override
-    public Source<Video, NotUsed> searchVideos(String keyword) {
+    public CompletionStage<Response> searchVideos(String keyword) {
         WSRequest request = ws.url(YOUTUBE_SEARCH_URL)
                 .addQueryParameter("part", "snippet")
                 .addQueryParameter("q", keyword)
@@ -37,7 +35,7 @@ public class YouTubeServiceImpl implements YouTubeService {
                 .addQueryParameter("maxResults", "10")
                 .addQueryParameter("key", apiKey);
 
-        CompletionStage<List<Video>> listCompletionStage = request.get()
+        CompletionStage<Response> responseStage = request.get()
                 .thenApply(WSResponse::asJson)
                 .thenApply(json -> {
                     Iterable<JsonNode> items = json.get("items");
@@ -46,18 +44,26 @@ public class YouTubeServiceImpl implements YouTubeService {
                                 String videoId = item.get("id").get("videoId").asText();
                                 String title = item.get("snippet").get("title").asText();
                                 String description = item.get("snippet").get("description").asText();
+                                String imageUrl = item.get("snippet").get("thumbnails").get("high").get("url").asText();
                                 String channelId = item.get("snippet").get("channelId").asText();
                                 String channelTitle = item.get("snippet").get("channelTitle").asText();
-                                return new Video(videoId, title, description, channelId, channelTitle);
+                                return new Video(videoId, title, description, imageUrl, channelId, channelTitle);
                             })
                             .collect(Collectors.toList());
+                }).thenApply(videos -> {
+                    Response response = new Response();
+                    response.setQuery(keyword);
+                    response.setVideos(videos);
+                    return response;
                 });
 
 //        return Source.completionStage(listCompletionStage)
 //                .flatMapConcat(Source::from)
 //                .mapAsync(2, this::fetchDescription);
-        return Source.completionStage(listCompletionStage)
-                .flatMapConcat(Source::from);
+        // TODO : PART 4 AND 5
+//        return Source.completionStage(listCompletionStage)
+//                .flatMapConcat(Source::from);
+        return responseStage;
     }
 
     private CompletionStage<Video> fetchDescription(Video video) {

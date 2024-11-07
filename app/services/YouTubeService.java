@@ -1,9 +1,10 @@
 package services;
 
-import akka.NotUsed;
-import akka.stream.javadsl.Source;
-import model.Video;
+import model.Response;
+
+import java.util.concurrent.CompletionStage;
 
 public interface YouTubeService {
-        Source<Video, NotUsed> searchVideos(String keyword);
+        CompletionStage<Response> searchVideos(String keyword);
+//        Source<Video, NotUsed> searchVideos(String keyword);
 }
