@@ -7,6 +7,8 @@ public class Video {
     private String imageUrl;
     private String channelId;
     private String channelTitle;
+    private Double fleschKincaidGradeLevel;
+    private Double FleschReadingScore;
 
     public Video() {
     }
@@ -68,13 +70,19 @@ public class Video {
         this.channelTitle = channelTitle;
     }
 
-    @Override
-    public String toString() {
-        return "Video{" +
-                "videoId='" + videoId + '\'' +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", channelTitle='" + channelTitle + '\'' +
-                '}';
+    public Double getFleschKincaidGradeLevel() {
+        return fleschKincaidGradeLevel;
+    }
+
+    public void setFleschKincaidGradeLevel(Double fleschKincaidGradeLevel) {
+        this.fleschKincaidGradeLevel = fleschKincaidGradeLevel;
+    }
+
+    public Double getFleschReadingScore() {
+        return FleschReadingScore;
+    }
+
+    public void setFleschReadingScore(Double fleschReadingScore) {
+        FleschReadingScore = fleschReadingScore;
     }
 }
