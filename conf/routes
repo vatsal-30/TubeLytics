@@ -3,9 +3,12 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                           controllers.HomeController.index()
+#GET     /                           controllers.HomeController.index()
+GET     /              controllers.YouTubeController.index(request: Request)
 
-GET     /test                       controllers.YouTubeController.search()
+GET     /ytlytics                   controllers.YouTubeController.index(request: Request)
+
+POST     /search                     controllers.YouTubeController.search(request: Request)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
