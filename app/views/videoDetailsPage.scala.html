@@ -1,0 +1,98 @@
+@import model.Video
+@(video: Video)
+
+@main("Video Details") {
+<style>
+    /* General styling for the video details page */
+    .video-details-container {
+        width: 80%;
+        margin: 30px auto;
+        font-family: Arial, sans-serif;
+        color: #333;
+    }
+
+    .video-title {
+        font-size: 2em;
+        margin-bottom: 10px;
+        color: #444;
+    }
+
+    .video-thumbnail {
+        max-width: 100%;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .video-info {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .video-info p {
+        font-size: 1.1em;
+        line-height: 1.6;
+        margin-bottom: 10px;
+    }
+
+    .channel-link {
+        color: #0077cc;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .channel-link:hover {
+        text-decoration: underline;
+    }
+
+    .tags-container {
+        margin-top: 10px;
+    }
+
+    .tag-link {
+        display: inline-block;
+        background-color: #fds;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .tag-link:hover {
+        background-color: #bbdcff;
+    }
+
+</style>
+
+<div class="video-details-container">
+    <!-- Video Thumbnail First -->
+    <div class="video-thumbnail">
+        <img src="@video.getImageUrl()" alt="Video Thumbnail" class="thumbnail-image">
+    </div>
+
+    <h1 class="video-title">@video.getTitle()</h1>
+
+    <div class="video-info">
+        <p><strong>Channel:</strong>
+            <a href="https://www.youtube.com/channel/@video.getChannelId()" target="_blank" class="channel-link">@video.getChannelTitle()</a>
+        </p>
+        <p><strong>Description:</strong> @video.getDescription()</p>
+
+        @if(video.getTags() != null && video.getTags().trim.nonEmpty) {
+        @defining(video.getTags().split(",").map(_.trim)) { tagsArray =>
+        <p><strong>Tags:</strong></p>
+        <div class="tags-container">
+            @for(tag <- tagsArray) {
+            <a href="/tags?tag=@tag" class="tag-link" target="_blank">@tag</a>
+            }
+        </div>
+        }
+        }
+    </div>
+</div>
+
+}

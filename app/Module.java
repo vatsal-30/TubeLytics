@@ -3,7 +3,9 @@ import com.google.inject.Provides;
 import com.typesafe.config.Config;
 import play.Environment;
 import play.libs.ws.WSClient;
+import services.VideoService;
 import services.YouTubeService;
+import services.impl.VideoServiceImpl;
 import services.impl.YouTubeServiceImpl;
 
 public class Module extends AbstractModule {
@@ -25,5 +27,11 @@ public class Module extends AbstractModule {
     public YouTubeService provideYouTubeService(WSClient wsClient) {
         String apiKey = config.getString("youtube.api.key");
         return new YouTubeServiceImpl(wsClient, apiKey);
+    }
+
+    @Provides
+    public VideoService provideVideoService(WSClient wsClient) {
+        String apiKey = config.getString("youtube.api.key");
+        return new VideoServiceImpl(wsClient, apiKey);
     }
 }

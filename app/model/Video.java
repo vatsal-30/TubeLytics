@@ -1,5 +1,8 @@
 package model;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Video {
     private String videoId;
     private String title;
@@ -9,6 +12,8 @@ public class Video {
     private String channelTitle;
     private Double fleschKincaidGradeLevel;
     private Double FleschReadingScore;
+
+    private String tags;
 
     public Video() {
     }
@@ -20,6 +25,16 @@ public class Video {
         this.imageUrl = imageUrl;
         this.channelId = channelId;
         this.channelTitle = channelTitle;
+    }
+
+    public Video(String videoId, String title, String description, String imageUrl, String channelId, String channelTitle, String tags) {
+        this.videoId = videoId;
+        this.title = title;
+        this.description = description;
+        this.imageUrl = imageUrl;
+        this.channelId = channelId;
+        this.channelTitle = channelTitle;
+        this.tags=tags;
     }
 
     public String getVideoId() {
@@ -48,6 +63,15 @@ public class Video {
 
     public String getImageUrl() {
         return imageUrl;
+    }
+
+    public String getTags() {
+//        System.out.println(Arrays.toString(tags));
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 
     public void setImageUrl(String imageUrl) {
