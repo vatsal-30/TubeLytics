@@ -12,9 +12,12 @@ import services.YouTubeService;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class YouTubeServiceImpl implements YouTubeService {
@@ -36,7 +39,8 @@ public class YouTubeServiceImpl implements YouTubeService {
                 .addQueryParameter("part", "snippet")
                 .addQueryParameter("q", keyword)
                 .addQueryParameter("type", "video")
-                .addQueryParameter("maxResults", "10")
+                .addQueryParameter("maxResults", "50")
+                .addQueryParameter("order", "date")
                 .addQueryParameter("key", apiKey);
 
         CompletionStage<Response> responseStage = request.get()
@@ -234,5 +238,43 @@ public class YouTubeServiceImpl implements YouTubeService {
     private static int countSentences(String text) {
         String[] sentences = text.split("[.!?;:]");
         return sentences.length;
+    }
+
+    @Override
+    public CompletionStage<List<String>> wordStatesVideos(String keyword) {
+
+        CompletionStage<Response> responseCompletionStage = this.searchVideos(keyword);
+
+        return responseCompletionStage.thenApply(response -> {
+            List<Video> videos=response.getVideos();
+            List<String> descriptions=videos.stream().map(Video::getDescription)
+                    .collect(Collectors.toList());
+
+            List<String> wordStats = calculateWordStats(descriptions);
+
+            return  wordStats;
+
+        });
+
+    }
+
+    private List<String> calculateWordStats(List<String> descriptions) {
+        Map<String, Long> wordCounts = descriptions.stream()
+                .flatMap(description -> Stream.of(description.split("\\W+"))) // Split on non-word characters
+                .map(String::toLowerCase) // Convert to lowercase
+                .filter(word -> !word.isEmpty()) // Remove empty words
+                .collect(Collectors.groupingBy(word -> word, Collectors.counting())); // Count frequencies
+
+        // Build a string representation of the word stats
+//        StringBuilder statsBuilder = new StringBuilder();
+//        wordCounts.entrySet().stream()
+//                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue())) // Sort by frequency
+//                .forEach(entry -> statsBuilder.append(entry.getKey()).append(": ").append(entry.getValue()).append("<br>"));
+//
+//        return statsBuilder.toString();
+        return wordCounts.entrySet().stream()
+                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue())) // Sort by frequency
+                .map(entry -> entry.getKey() + ": " + entry.getValue()) // Format each entry as "word: count"
+                .collect(Collectors.toList());
     }
 }

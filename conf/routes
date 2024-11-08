@@ -22,3 +22,5 @@ GET     /search/:query             controllers.YouTubeController.searchTags(quer
 GET     /tags                       controllers.YouTubeController.searchTags(tag: String)
 
 GET     /channel/:channelId   controllers.YouTubeController.channelProfile(channelId: String)
+
+GET     /wordStats/:searchQuery      controllers.WordStatsController.getWordStats(searchQuery : String)
