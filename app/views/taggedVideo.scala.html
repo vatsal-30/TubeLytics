@@ -1,0 +1,117 @@
+@import model.Response
+@import model.Video
+@(response: Response)
+
+@main("Tagged Videos") {
+<h1>Search Results for tag : "@response.getQuery()"</h1>
+
+
+
+<!-- Check if there are videos in the response -->
+@if(response.getVideos() != null && response.getVideos().nonEmpty) {
+<div id="resultsContainer">
+    <!-- Iterate over the first 10 videos -->
+    @for(video <- response.getVideos().take(10)) {
+    <div class="video-result">
+        <div class="video-info">
+            <div class="video-text">
+                <h3><strong>Title: </strong>@video.getTitle()</h3>
+                <p><strong>Channel: </strong> <a href="https://www.youtube.com/channel/@video.getChannelId()" target="_blank">@video.getChannelTitle()</a></p>
+                <p><strong>Description: </strong> @video.getDescription()</p>
+
+                <!-- Optional: display tags if available -->
+                @if(video.getTags() != null && video.getTags().nonEmpty) {
+                <p><strong>Tags:</strong> @video.getTags().mkString(", ")</p>
+                }
+            </div>
+
+            <div class="thumbnail-container">
+                <img src="@video.getImageUrl()" alt="Thumbnail for @video.getTitle()" class="thumbnail">
+            </div>
+        </div>
+    </div>
+    <hr/>
+    }
+</div>
+} else {
+<p>No videos found for this query.</p>
+}
+
+<!-- Add Inline CSS for styling -->
+<style>
+    /* General styling for video results */
+    #resultsContainer {
+        margin-top: 20px;
+        margin-left: 50px;
+        margin-right: 50px;
+    }
+
+    .video-result {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        border-bottom: 1px solid #ddd;
+        padding: 10px 0;
+    }
+
+    .video-info {
+        display: flex;
+        max-width: 100%;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .video-text {
+        width: 90%;
+    }
+
+    .video-info div {
+        color: #555;
+        margin-bottom: 10px;
+    }
+
+    .video-info div a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .video-info div a:hover {
+        text-decoration: underline;
+    }
+
+    .thumbnail-container {
+        display: flex;
+        justify-content: center;
+        width: 120px;
+    }
+
+    .thumbnail {
+        width: 100%;
+        height: auto;
+        border-radius: 4px;
+    }
+
+    /* Styling for tags */
+    .video-info .tags-link {
+        color: #007bff;
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    h1 {
+        font-size: 2em;
+        margin-bottom: 20px;
+        color: #444;
+    }
+
+    h3 {
+        font-size: 1.5em;
+        color: #333;
+    }
+
+    p {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+    }
+</style>
+}

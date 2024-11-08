@@ -63,8 +63,10 @@
                                                     <a href="/channel/${video.channelId}" target="_blank">${video.channelTitle}</a> |
                                                     <strong>Description:</strong> ${video.description} |
                                                     Flesch-Kincaid Grade Level = ##, Flesch Reading Ease Score = ##.
-                                                    <a href="#" class="tags-link">Tags</a>
+                                                    <a href="/ytlytics/video/${encodeURIComponent(video.videoId)}" class="tags-link" target="_blank" >Tags</a>
+
                                                 </div>
+
 
                                                 <div class="thumbnail-container">
                                                     <img src="${video.imageUrl}" alt="Video Thumbnail" class="thumbnail">
