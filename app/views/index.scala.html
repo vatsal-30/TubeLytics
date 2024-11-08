@@ -41,15 +41,16 @@
                                 headers: {'Csrf-Token': $('input[name="csrfToken"]').val()}, // Set CSRF header
                                 success: function (response) {
 
+                                // Display overall sentiment
+                                const sentiment = response.sentiment;
 
-
-                                    let searchGroup=`
-                                    <div>
-                                        <div class="search-terms">
-                                            <p>Search terms: ${query} :-|</p>
-                                            <p>Flesch-Kincaid Grade Level Avg. = ##, Flesch Reading Ease Score Avg. = ##</p>
-                                        </div>
-                                    `;
+                                let searchGroup=`
+                                <div>
+                                    <div class="search-terms">
+                                        <p>Search terms: ${query} : ${sentiment}</p>
+                                        <p>Flesch-Kincaid Grade Level Avg. = ##, Flesch Reading Ease Score Avg. = ##</p>
+                                    </div>
+                                `;
 
                                 response.videos.slice(0, 10).forEach(
                                 (video, index) => { // Limit to 10 results
