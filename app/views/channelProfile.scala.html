@@ -1,0 +1,27 @@
+@import model.ChannelProfile
+
+
+@(channel: ChannelProfile)
+
+@main("Welcome to Play") {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@channel.getName() - Profile</title>
+</head>
+<body>
+<div class="channel-profile">
+    <h1>@channel.getName()</h1>
+    <img src="@channel.getImageUrl()" alt="Channel Profile Image">
+    <p>Subscriber Count: @channel.getSubscriberCount()</p>
+    <p>Video Count: @channel.getVideoCount()</p>
+    <p>Description: @channel.getDescription()</p>
+
+<!--    <h3>Videos:</h3>-->
+
+</div>
+</body>
+</html>
+}

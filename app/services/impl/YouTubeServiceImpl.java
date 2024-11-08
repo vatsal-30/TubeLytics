@@ -1,6 +1,7 @@
 package services.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import model.ChannelProfile;
 import model.Response;
 import model.Video;
 import play.libs.ws.WSClient;
@@ -95,6 +96,30 @@ public class YouTubeServiceImpl implements YouTubeService {
 //                .flatMapConcat(Source::from);
         return responseStage;
     }
+
+
+//    This is my Amish Part
+    public CompletionStage<ChannelProfile> getChannelProfile(String channelId) {
+        String apiUrl = "https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=" + channelId + "&key=AIzaSyC0fC9nUXNPtREfQqS3kqnr4TJIee3Ay_Q";
+
+        return ws.url(apiUrl)
+                .get()
+                .thenApply(response -> {
+                    // Process the response and create a ChannelProfile object
+                    String name = response.asJson().get("items").get(0).get("snippet").get("title").asText();
+                    String imageUrl = response.asJson().get("items").get(0).get("snippet").get("thumbnails")
+                            .get("default").get("url").asText();
+                    String description = response.asJson().get("items").get(0).get("snippet").get("description").asText();
+                    String subscriberCount = response.asJson().get("items").get(0).get("statistics")
+                            .get("subscriberCount").asText();
+                    String videoCount = response.asJson().get("items").get(0).get("statistics")
+                            .get("videoCount").asText();
+
+                    // Return a new ChannelProfile object with fetched data
+                    return new ChannelProfile(name, imageUrl, description, subscriberCount, videoCount);
+                });
+    }
+
 
     private CompletionStage<String> fetchDescription(String id) {
         return this.ws.url(YOUTUBE_VIDEO_URL)
