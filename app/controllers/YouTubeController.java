@@ -39,6 +39,7 @@ public class YouTubeController extends Controller {
                 .thenApply(response -> ok(Json.toJson(response)));
     }
 
+
     public CompletionStage<Result> showVideoDetails(String videoId) {
         return videoService.getVideoById(videoId)
                 .thenApply(video -> ok(views.html.videoDetailsPage.render(video)));
@@ -50,5 +51,17 @@ public class YouTubeController extends Controller {
 
     }
 
+    // Method to get channel profile
+    public CompletionStage<Result> channelProfile(String channelId) {
 
+        return youTubeService.getChannelProfile(channelId) // Fetch channel profile
+                .thenCompose(channelProfile -> {
+                    return youTubeService.getChannelVideos(channelId, 10) // Fetch the 10 latest videos
+                            .thenApply(videos -> {
+                                channelProfile.setVideos(videos);  // Add videos to the channel profile
+                                return ok(views.html.channelProfile.render(channelProfile)); // Pass to the view
+                            });
+                });
+
+    }
 }

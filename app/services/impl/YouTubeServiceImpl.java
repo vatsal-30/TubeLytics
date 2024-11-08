@@ -1,6 +1,7 @@
 package services.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import model.ChannelProfile;
 import model.Response;
 import model.Video;
 import play.libs.ws.WSClient;
@@ -9,6 +10,7 @@ import play.libs.ws.WSResponse;
 import services.YouTubeService;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -21,7 +23,7 @@ public class YouTubeServiceImpl implements YouTubeService {
     private final String apiKey;
     private static final String YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search";
     private static final String YOUTUBE_VIDEO_URL = "https://www.googleapis.com/youtube/v3/videos";
-
+    private  static final String YOUTUBE_CHANNEL_URL = "https://www.googleapis.com/youtube/v3/channels";
     @Inject
     public YouTubeServiceImpl(WSClient ws, String apiKey) {
         this.ws = ws;
@@ -95,6 +97,58 @@ public class YouTubeServiceImpl implements YouTubeService {
 //                .flatMapConcat(Source::from);
         return responseStage;
     }
+
+
+    //    This is my Amish Part
+    public CompletionStage<ChannelProfile> getChannelProfile(String channelId) {
+        return this.ws.url(YOUTUBE_CHANNEL_URL)
+                .addQueryParameter("part","snippet,statistics")
+                .addQueryParameter("id",channelId)
+                .addQueryParameter("key",apiKey)
+                .get()
+                .thenApply(response -> {
+                    // Process the response and create a ChannelProfile object
+                    String name = response.asJson().get("items").get(0).get("snippet").get("title").asText();
+                    String imageUrl = response.asJson().get("items").get(0).get("snippet").get("thumbnails")
+                            .get("default").get("url").asText();
+                    String description = response.asJson().get("items").get(0).get("snippet").get("description").asText();
+                    String subscriberCount = response.asJson().get("items").get(0).get("statistics")
+                            .get("subscriberCount").asText();
+                    String videoCount = response.asJson().get("items").get(0).get("statistics")
+                            .get("videoCount").asText();
+
+                    // Return a new ChannelProfile object with fetched data
+                    return new ChannelProfile(name, imageUrl, description, subscriberCount, videoCount, new ArrayList<>());
+                });
+    }
+
+    @Override
+    public CompletionStage<List<Video>> getChannelVideos(String channelId, int i) {
+        return this.ws.url(YOUTUBE_SEARCH_URL)
+                .addQueryParameter("part", "snippet")
+                .addQueryParameter("channelId", channelId)
+                .addQueryParameter("order", "date")
+                .addQueryParameter("type", "video")
+                .addQueryParameter("maxResults", Integer.toString(i))
+                .addQueryParameter("key", apiKey)
+                .get()
+                .thenApply(WSResponse::asJson)
+                .thenApply(json -> {
+                    Iterable<JsonNode> items = json.get("items");
+
+                    return StreamSupport.stream(items.spliterator(), false)
+                            .map(item -> {
+                                String videoId = item.get("id").get("videoId").asText();
+                                String title = item.get("snippet").get("title").asText();
+                                String description = item.get("snippet").get("description").asText();
+                                String imageUrl = item.get("snippet").get("thumbnails").get("high").get("url").asText();
+                                String channelTitle = item.get("snippet").get("channelTitle").asText();
+
+                                return new Video(videoId, title, description, imageUrl, channelId, channelTitle);
+                            }).toList();
+                });
+    }
+
 
     private CompletionStage<String> fetchDescription(String id) {
         return this.ws.url(YOUTUBE_VIDEO_URL)

@@ -21,3 +21,4 @@ GET     /search/:query             controllers.YouTubeController.searchTags(quer
 # Route to search by tag with query parameter
 GET     /tags                       controllers.YouTubeController.searchTags(tag: String)
 
+GET     /channel/:channelId   controllers.YouTubeController.channelProfile(channelId: String)

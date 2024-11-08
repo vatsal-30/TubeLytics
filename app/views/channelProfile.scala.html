@@ -1,0 +1,137 @@
+@import model.ChannelProfile
+@import model.Video
+
+@(channel: ChannelProfile)
+
+@main("Welcome to Play") {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@channel.getName() - Profile</title>
+
+    <style>
+        /* Channel Profile CSS */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .channel-profile {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .channel-profile h1 {
+            font-size: 2em;
+            color: #333;
+            margin: 0 0 10px;
+        }
+
+        .videoimage {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+        }
+        .totalvideo{
+            font-size: 1.2em;
+            color: #04da09 !important;
+
+        }
+        .sub {
+            font-size: 1.5em;
+            color: #f31111 !important;
+
+        }
+
+        .channel-profile p {
+            color: #666;
+            margin: 8px 0;
+        }
+
+        h3 {
+            margin-top: 20px;
+            color: #333;
+            font-size: 1.5em;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 10px;
+        }
+
+        li {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        /* Video Thumbnail Styling: Rectangular Shape */
+        li img {
+            margin-right: 15px;
+            width: 160px;
+            height: 90px;
+            object-fit: cover;
+        }
+
+        li h4 {
+            font-size: 1.2em;
+            color: #333;
+            margin: 0;
+        }
+
+        li p {
+            color: #666;
+            margin: 5px 0;
+            font-size: 0.95em;
+            line-height: 1.4em;
+        }
+
+        a {
+            color: #1a73e8;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+
+
+    </style>
+</head>
+<body>
+<div class="channel-profile">
+    <h1>@channel.getName()</h1>
+    <img class="videoimage" src="@channel.getImageUrl()" alt="Channel Profile Image">
+    <p class="sub">Subscriber Count: @channel.getSubscriberCount()</p>
+    <p class="totalvideo">Total Video: @channel.getVideoCount()</p>
+    <p>Description: @channel.getDescription()</p>
+
+    <h3>Videos:</h3>
+    <ul>
+        @for(video <- channel.getVideos()) {
+        <li>
+            <img src="@video.getImageUrl()" alt="@video.getTitle()">
+            <h4> Title: @video.getTitle()</h4>
+            <p> Description: @video.getDescription()</p>
+            <a href="https://www.youtube.com/watch?v=@video.getVideoId()" target="_blank">Watch Video</a>
+        </li>
+        }
+    </ul>
+</div>
+</body>
+</html>
+}
