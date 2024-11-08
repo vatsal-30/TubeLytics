@@ -34,4 +34,10 @@ public class YouTubeController extends Controller {
                 .searchVideos(keyword)
                 .thenApply(response -> ok(Json.toJson(response)));
     }
+    // Method to get channel profile
+    public CompletionStage<Result> channelProfile(String channelId) {
+        return youTubeService
+                .getChannelProfile(channelId)  // Assuming this method exists in the YouTubeService
+                .thenApply(channelProfile -> ok(views.html.channelProfile.render(channelProfile)));
+    }
 }
