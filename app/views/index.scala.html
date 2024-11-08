@@ -3,95 +3,96 @@
 @(searchForm: Form[SearchForm])(implicit request: Request)
 
 @main("Welcome to Play") {
-    <!--  <h1>Welcome to Play!</h1>-->
+<!--  <h1>Welcome to Play!</h1>-->
 <!DOCTYPE html>
-    <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>YT Lytics</title>
-            <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")">
-        </head>
-        <body>
-            <div class="container">
-                <h1>Welcome to YT lytics</h1>
-                @helper.form(routes.YouTubeController.search) {
-                    @helper.CSRF.formField
-                    <div class="search-bar">
-                        <input type="text" name="query" placeholder="Enter search terms"/>
-                        <button type="submit">Go!</button>
-                    </div>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YT Lytics</title>
+    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")">
+</head>
+<body>
+<div class="container">
+    <h1>Welcome to YT lytics</h1>
+    @helper.form(routes.YouTubeController.search) {
+    @helper.CSRF.formField
+    <div class="search-bar">
+        <input type="text" name="query" placeholder="Enter search terms"/>
+        <button type="submit">Go!</button>
+    </div>
+    }
+</div>
+
+<div id="resultsContainer">
+
+    <div id="results"></div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('form').on('submit', function (event) {
+            event.preventDefault();
+            const query = $('input[name="query"]').val();
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'POST',
+                data: $(this).serialize(),
+                headers: {'Csrf-Token': $('input[name="csrfToken"]').val()}, // Set CSRF header
+                success: function (response) {
+
+
+
+                    let searchGroup=`
+                    <div class="result">
+                        <div class="search-terms">
+                            <p>Search terms: ${query} :-|</p>
+                            <p>Flesch-Kincaid Grade Level Avg. = ${response.averageFleschKincaidGradeLevel}, Flesch Reading Ease Score Avg. = ${response.averageFleschReadingScore}</p>
+                            <a href="/wordStats/${encodeURIComponent(query)}" class="tags-link" target="blank">More Stats</a>
+                        </div>
+                    `;
+
+                response.videos.slice(0, 10).forEach(
+                (video, index) => { // Limit to 10 results
+                    searchGroup+=`
+                        <div class="video-result">
+                            <div class="video-info">
+                                <div class="video-text">
+                                    <strong>${index + 1}. Title:</strong>
+                                    <a href="https://www.youtube.com/watch?v=${video.videoId}" target="_blank">${video.title}</a> |
+                                    <strong>Channel:</strong>
+                                    <a href="/channel/${video.channelId}" target="_blank">${video.channelTitle}</a> |
+                                    <strong>Description:</strong> ${video.description} |
+                                    Flesch-Kincaid Grade Level = ${video.fleschKincaidGradeLevel}, Flesch Reading Ease Score = ${video.fleschReadingScore}.
+                                    <a href="/ytlytics/video/${encodeURIComponent(video.videoId)}" class="tags-link" target="_blank" >Tags</a>
+
+                                </div>
+
+
+                                <div class="thumbnail-container">
+                                    <img src="${video.imageUrl}" alt="Video Thumbnail" class="thumbnail">
+                                </div>
+
+                            </div>
+                        </div>
+                    `;
+                    searchGroup += `</div>`;
+
+                });
+                    $('#results').prepend(searchGroup);
+
+
+                },
+                error: function () {
+                    alert("Error submitting data.");
                 }
-            </div>
-
-            <div id="resultsContainer">
-
-                <div id="results"></div>
-            </div>
-
-            <script>
-                    $(document).ready(function () {
-                        $('form').on('submit', function (event) {
-                            event.preventDefault();
-                            const query = $('input[name="query"]').val();
-                            $.ajax({
-                                url: $(this).attr('action'),
-                                type: 'POST',
-                                data: $(this).serialize(),
-                                headers: {'Csrf-Token': $('input[name="csrfToken"]').val()}, // Set CSRF header
-                                success: function (response) {
+            });
+        })
+    })
 
 
-
-                                    let searchGroup=`
-                                    <div>
-                                        <div class="search-terms">
-                                            <p>Search terms: ${query} :-|</p>
-                                            <p>Flesch-Kincaid Grade Level Avg. = ##, Flesch Reading Ease Score Avg. = ##</p>
-                                        </div>
-                                    `;
-
-                                response.videos.slice(0, 10).forEach(
-                                (video, index) => { // Limit to 10 results
-                                    searchGroup+=`
-                                        <div class="video-result">
-                                            <div class="video-info">
-                                                <div class="video-text">
-                                                    <strong>${index + 1}. Title:</strong>
-                                                    <a href="https://www.youtube.com/watch?v=${video.videoId}" target="_blank">${video.title}</a> |
-                                                    <strong>Channel:</strong>
-                                                    <a href="/channel/${video.channelId}" target="_blank">${video.channelTitle}</a> |
-                                                    <strong>Description:</strong> ${video.description} |
-                                                    Flesch-Kincaid Grade Level = ##, Flesch Reading Ease Score = ##.
-                                                    <a href="/ytlytics/video/${encodeURIComponent(video.videoId)}" class="tags-link" target="_blank" >Tags</a>
-
-                                                </div>
-
-
-                                                <div class="thumbnail-container">
-                                                    <img src="${video.imageUrl}" alt="Video Thumbnail" class="thumbnail">
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    `;
-                                    searchGroup += `</div>`;
-
-                                });
-                                    $('#results').prepend(searchGroup);
-
-
-                                },
-                                error: function () {
-                                    alert("Error submitting data.");
-                                }
-                            });
-                        })
-                    })
-
-
-            </script>
-        </body>
-    </html>
+</script>
+</body>
+</html>
 
 }

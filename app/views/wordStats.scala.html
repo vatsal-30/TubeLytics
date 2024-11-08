@@ -1,0 +1,40 @@
+@(keyword: String, wordStats: List[String])
+@main("Word Stats for @keyword"){
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/wordStats.css")">
+        <title>Title</title>
+    </head>
+    <body>
+    <div class="container">
+        <h1>Word Stats for "@keyword"</h1>
+        <div class="word-stats">
+            <table>
+                <thead>
+                <tr>
+                    <th>Word</th>
+                    <th>Count</th>
+                </tr>
+                </thead>
+                <tbody>
+                @for(stat <- wordStats) {
+                @* Split each entry at ": " to separate the word and the count *@
+                @defining(stat.split(": ")) { splitStat =>
+                <tr>
+                    <td>@splitStat(0)</td>
+                    <td>@splitStat(1)</td>
+                </tr>
+                }
+                }
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+    </body>
+    </html>
+}
