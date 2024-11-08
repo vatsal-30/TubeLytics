@@ -1,25 +1,28 @@
 package model;
 
+import java.util.List;
+
 public class ChannelProfile {
     private String name;
     private String imageUrl;
     private String description;
     private String subscriberCount;
     private String videoCount;
+    private List<Video> videos; // List of videos
 
     // Constructor
-    public ChannelProfile(String name, String imageUrl, String description, String subscriberCount, String videoCount) {
+    public ChannelProfile(String name, String imageUrl, String description,
+                          String subscriberCount, String videoCount, List<Video> videos) {
         this.name = name;
         this.imageUrl = imageUrl;
         this.description = description;
         this.subscriberCount = subscriberCount;
         this.videoCount = videoCount;
+        this.videos = videos;
     }
 
-    public ChannelProfile(String text, String text1, String text2) {
-    }
+    // Getter and Setter methods
 
-    // Getter and Setter for name
     public String getName() {
         return name;
     }
@@ -28,7 +31,6 @@ public class ChannelProfile {
         this.name = name;
     }
 
-    // Getter and Setter for imageUrl
     public String getImageUrl() {
         return imageUrl;
     }
@@ -37,7 +39,6 @@ public class ChannelProfile {
         this.imageUrl = imageUrl;
     }
 
-    // Getter and Setter for description
     public String getDescription() {
         return description;
     }
@@ -46,7 +47,6 @@ public class ChannelProfile {
         this.description = description;
     }
 
-    // Getter and Setter for subscriberCount
     public String getSubscriberCount() {
         return subscriberCount;
     }
@@ -55,12 +55,19 @@ public class ChannelProfile {
         this.subscriberCount = subscriberCount;
     }
 
-    // Getter and Setter for videoCount
     public String getVideoCount() {
         return videoCount;
     }
 
     public void setVideoCount(String videoCount) {
         this.videoCount = videoCount;
+    }
+
+    public List<Video> getVideos() {
+        return videos;
+    }
+
+    public void setVideos(List<Video> videos) {
+        this.videos = videos;
     }
 }

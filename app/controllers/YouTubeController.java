@@ -36,8 +36,18 @@ public class YouTubeController extends Controller {
     }
     // Method to get channel profile
     public CompletionStage<Result> channelProfile(String channelId) {
-        return youTubeService
-                .getChannelProfile(channelId)  // Assuming this method exists in the YouTubeService
-                .thenApply(channelProfile -> ok(views.html.channelProfile.render(channelProfile)));
+
+        return youTubeService.getChannelProfile(channelId) // Fetch channel profile
+                .thenCompose(channelProfile -> {
+                    return youTubeService.getChannelVideos(channelId, 10) // Fetch the 10 latest videos
+                            .thenApply(videos -> {
+                                channelProfile.setVideos(videos);  // Add videos to the channel profile
+                                return ok(views.html.channelProfile.render(channelProfile)); // Pass to the view
+                            });
+                });
+
     }
+
+
+
 }
