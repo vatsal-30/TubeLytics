@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import services.SentimentAnalyzer;
 
 public class YouTubeServiceImpl implements YouTubeService {
 
@@ -35,6 +36,9 @@ public class YouTubeServiceImpl implements YouTubeService {
 
     @Override
     public CompletionStage<Response> searchVideos(String keyword) {
+
+        SentimentAnalyzer sentimentAnalyzer = new SentimentAnalyzer();
+
         WSRequest request = ws.url(YOUTUBE_SEARCH_URL)
                 .addQueryParameter("part", "snippet")
                 .addQueryParameter("q", keyword)
@@ -70,15 +74,22 @@ public class YouTubeServiceImpl implements YouTubeService {
                 .thenCompose(response -> {
                     AtomicReference<Double> fkg = new AtomicReference<>(0.0);
                     AtomicReference<Double> frs = new AtomicReference<>(0.0);
+
+                    List<String> descriptions = new ArrayList<>();
+
                     List<CompletableFuture<Void>> completionStageList = response.getVideos().stream()
                             .map(video -> fetchDescription(video.getVideoId())
                                     .thenAccept(fullDescription -> {
                                         double[] readabilityScores = calculateReadabilityScores(fullDescription);
+
+                                        descriptions.add(fullDescription);
+
                                         fkg.updateAndGet(v -> (v + readabilityScores[0]));
                                         video.setFleschKincaidGradeLevel(readabilityScores[0]);
                                         frs.updateAndGet(v -> (v + readabilityScores[1]));
                                         video.setFleschReadingScore(readabilityScores[1]);
                                         video.setDescription(fullDescription);
+
                                     }).toCompletableFuture()).toList();
 
                     CompletableFuture<Void> allUpdates = CompletableFuture.allOf(
@@ -89,6 +100,10 @@ public class YouTubeServiceImpl implements YouTubeService {
                         int size = response.getVideos().size();
                         response.setAverageFleschKincaidGradeLevel(fkg.get() / size);
                         response.setAverageFleschReadingScore(frs.get() / size);
+
+                        String sentimentResult = sentimentAnalyzer.analyzeSentiment(descriptions);
+                        response.setSentiment(sentimentResult);
+
                         return response;
                     });
                 });

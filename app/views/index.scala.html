@@ -46,7 +46,7 @@
                     let searchGroup=`
                     <div class="result">
                         <div class="search-terms">
-                            <p>Search terms: ${query} :-|</p>
+                            <p>Search terms: ${query} : ${response.sentiment}</p>
                             <p>Flesch-Kincaid Grade Level Avg. = ${response.averageFleschKincaidGradeLevel}, Flesch Reading Ease Score Avg. = ${response.averageFleschReadingScore}</p>
                             <a href="/wordStats/${encodeURIComponent(query)}" class="tags-link" target="blank">More Stats</a>
                         </div>
