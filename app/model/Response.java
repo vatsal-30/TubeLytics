@@ -7,6 +7,7 @@ public class Response {
     private Double averageFleschKincaidGradeLevel;
     private Double averageFleschReadingScore;
     private List<Video> videos;
+    private String sentiment;
 
     public Response() {
     }
@@ -41,5 +42,13 @@ public class Response {
 
     public void setVideos(List<Video> videos) {
         this.videos = videos;
+    }
+
+    public String getSentiment() {
+        return sentiment;
+    }
+
+    public void setSentiment(String sentiment) {
+        this.sentiment = sentiment;
     }
 }
