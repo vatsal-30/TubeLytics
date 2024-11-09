@@ -4,9 +4,7 @@ import java.util.*;
 
 public class SentimentAnalyzer {
 
-    // Expanded sets of happy and sad words (add more words as needed)
     private static final Set<String> happyWords = new HashSet<>(Arrays.asList(
-            // Happy word variations
             "happy", "happier", "happiest", "happily", "happiness", "happifying",
             "joy", "joyful", "joyfully", "joyous", "joyousness", "enjoy", "enjoyable",
             "enjoyed", "enjoying", "enjoyment", "excite", "excited", "exciting", "excitedly",
@@ -31,7 +29,6 @@ public class SentimentAnalyzer {
     ));
 
     private static final Set<String> sadWords = new HashSet<>(Arrays.asList(
-            // Sad word variations
             "sad", "sadness", "sadly", "saddened", "saddening",
             "unhappy", "unhappily", "unhappiness",
             "depressed", "depressing", "depression", "depressingly",
@@ -91,10 +88,8 @@ public class SentimentAnalyzer {
      */
     public String analyzeSentimentForDescription(String description) {
 
-        // Convert description to lowercase and split into words
         String[] words = description.toLowerCase().split("\\s+");
 
-        // Count happy and sad words (case-insensitive matching)
         long happyCount = Arrays.stream(words)
                 .filter(happyWords::contains)
                 .count();
@@ -103,33 +98,22 @@ public class SentimentAnalyzer {
                 .filter(sadWords::contains)
                 .count();
 
-        // Calculate the total word count for normalization
         long totalWords = words.length;
 
-        // Prevent division by zero if no words are present
         if (totalWords == 0) {
-            return ":-|"; // Neutral if no words
+            return ":-|";
         }
 
-        // Calculate the percentage of happy and sad words in the description
         double happyPercentage = (double) happyCount / totalWords;
         double sadPercentage = (double) sadCount / totalWords;
 
-//         Determine sentiment based on the counts
         if (happyPercentage > 0.7) {
-            return ":-)"; // More than 70% happy words means positive sentiment
+            return ":-)";
         } else if (sadPercentage > 0.7) {
-            return ":-("; // More than 70% sad words means negative sentiment
+            return ":-(";
         } else {
-            return ":-|"; // Otherwise, the sentiment is neutral
+            return ":-|";
         }
-//        if (happyPercentage > sadPercentage) {
-//            return ":-)";
-//        } else if (happyPercentage < sadPercentage) {
-//            return ":-(";
-//        } else {
-//            return  ":-|";
-//        }
 
     }
 
@@ -140,7 +124,6 @@ public class SentimentAnalyzer {
      * @return A string representing the overall sentiment ("Happy", "Sad", or "Neutral").
      */
     public String analyzeSentiment(List<String> descriptions) {
-        // Count how many descriptions are happy, sad, or neutral
         long happyCount = descriptions.stream()
                 .map(this::analyzeSentimentForDescription)
                 .filter(s -> s.equals(":-)"))
@@ -158,24 +141,15 @@ public class SentimentAnalyzer {
 
         long totalCount = happyCount + sadCount + neutralCount;
 
-        // Calculate the percentage of happy, sad, and neutral sentiments
         double happyPercentage = (double) happyCount / totalCount;
         double sadPercentage = (double) sadCount / totalCount;
 
-        // Determine the overall sentiment based on the percentages
         if (happyPercentage > 0.7) {
-            return ":-)"; // More than 70% happy descriptions means overall happy sentiment
+            return ":-)";
         } else if (sadPercentage > 0.7) {
-            return ":-("; // More than 70% sad descriptions means overall sad sentiment
+            return ":-(";
         } else {
-            return ":-|"; // Otherwise, overall neutral sentiment
+            return ":-|";
         }
-//            if (happyPercentage > sadPercentage) {
-//                return ":-)";
-//            } else if (happyPercentage < sadPercentage) {
-//                return ":-(";
-//            } else {
-//                return  ":-|";
-//            }
     }
 }

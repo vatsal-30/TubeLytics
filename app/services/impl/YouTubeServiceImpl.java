@@ -76,7 +76,6 @@ public class YouTubeServiceImpl implements YouTubeService {
                     AtomicReference<Double> frs = new AtomicReference<>(0.0);
 
                     List<String> descriptions = new ArrayList<>();
-//                    AtomicReference<String> sentimentResult = new AtomicReference<>();
 
                     List<CompletableFuture<Void>> completionStageList = response.getVideos().stream()
                             .map(video -> fetchDescription(video.getVideoId())
@@ -91,7 +90,6 @@ public class YouTubeServiceImpl implements YouTubeService {
                                         video.setFleschReadingScore(readabilityScores[1]);
                                         video.setDescription(fullDescription);
 
-//                                        sentimentResult.set(sentimentAnalyzer.analyzeSentiment(descriptions));
                                     }).toCompletableFuture()).toList();
 
                     CompletableFuture<Void> allUpdates = CompletableFuture.allOf(
@@ -103,7 +101,6 @@ public class YouTubeServiceImpl implements YouTubeService {
                         response.setAverageFleschKincaidGradeLevel(fkg.get() / size);
                         response.setAverageFleschReadingScore(frs.get() / size);
 
-                        // Calculate sentiment based on aggregated descriptions
                         String sentimentResult = sentimentAnalyzer.analyzeSentiment(descriptions);
                         response.setSentiment(sentimentResult);
 
