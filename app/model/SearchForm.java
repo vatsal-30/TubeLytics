@@ -1,5 +1,10 @@
 package model;
 
+/**
+ * It contains a query field for taking the data from the front-end.
+ *
+ * @author Utsav Patel
+ */
 public class SearchForm {
     private String query;
 

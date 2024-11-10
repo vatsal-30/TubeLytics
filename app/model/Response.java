@@ -2,6 +2,11 @@ package model;
 
 import java.util.List;
 
+/**
+ * It contains all the necessary information about Response to showcase all the information on the front-end.
+ *
+ * @author Utsav Patel
+ */
 public class Response {
     private String query;
     private Double averageFleschKincaidGradeLevel;

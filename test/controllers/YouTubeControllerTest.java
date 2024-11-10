@@ -30,6 +30,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static play.test.Helpers.*;
 
+/**
+ * @author Utsav Patel
+ */
 public class YouTubeControllerTest extends WithApplication {
     private Response response;
 
@@ -47,6 +50,11 @@ public class YouTubeControllerTest extends WithApplication {
 
     private YouTubeController youTubeController;
 
+    /**
+     * This method sets up a dummy response object to test the controller.
+     *
+     * @author Utsav Patel
+     */
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -85,6 +93,11 @@ public class YouTubeControllerTest extends WithApplication {
         response.getVideos().add(video);
     }
 
+    /**
+     * This method tests the /search POST request.
+     *
+     * @author Utsav Patel
+     */
     @Test
     public void searchTest() throws ExecutionException, InterruptedException {
         Http.RequestBuilder requestBuilder = new Http.RequestBuilder()
@@ -125,6 +138,11 @@ public class YouTubeControllerTest extends WithApplication {
         }
     }
 
+    /**
+     * This method tests the / request.
+     *
+     * @author Utsav Patel
+     */
     @Test
     public void indexTest() {
         Http.RequestBuilder request = new Http.RequestBuilder()

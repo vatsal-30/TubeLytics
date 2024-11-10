@@ -23,6 +23,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+/**
+ * @author Utsav Patel
+ */
 public class Part5Test extends WithApplication {
 
     private final static String TEXT = "In a quaint little village nestled between misty mountains and sprawling green fields, there was a peculiar shop that everyone called \"The Whispering Lantern.\" The shop appeared ordinary from the outside, with a simple wooden sign swaying gently in the breeze, but inside, it was anything but. Shelves brimmed with enchanted trinkets, ancient scrolls, and curious artifacts from distant lands. Visitors claimed that each item had a story to tell, and if you listened closely, you could hear faint whispers echoing through the lanterns hanging from the ceiling.";
@@ -42,6 +45,11 @@ public class Part5Test extends WithApplication {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * This method sets up a dummy json response to test YouTubeService.
+     *
+     * @author Utsav Patel
+     */
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -86,6 +94,11 @@ public class Part5Test extends WithApplication {
                 """;
     }
 
+    /**
+     * This method tests searchVideos method of YouTubeService.
+     *
+     * @author Utsav Patel
+     */
     @Test
     public void testSearchVideoByKeyword() throws ExecutionException, InterruptedException, JsonProcessingException {
         when(wsClient.url(anyString())).thenReturn(wsRequest);
@@ -108,12 +121,22 @@ public class Part5Test extends WithApplication {
         assertEquals("vid-002", response.getVideos().get(1).getVideoId());
     }
 
+    /**
+     * This method tests countSentences method.
+     *
+     * @author Utsav Patel
+     */
     @Test
     public void countSentenceTest() {
         int countSentences = YouTubeServiceImpl.countSentences(TEXT);
         Assert.assertEquals(4, countSentences);
     }
 
+    /**
+     * This method tests splitIntoWords method.
+     *
+     * @author Utsav Patel
+     */
     @Test
     public void splitIntoWordsTest() {
         String[] words = YouTubeServiceImpl.splitIntoWords(TEXT);
@@ -123,12 +146,22 @@ public class Part5Test extends WithApplication {
         Assert.assertEquals("a", words[1]);
     }
 
+    /**
+     * This method tests isConsonant method.
+     *
+     * @author Utsav Patel
+     */
     @Test
     public void consonantTest() {
         Assert.assertFalse(YouTubeServiceImpl.isConsonant('a'));
         Assert.assertTrue(YouTubeServiceImpl.isConsonant('b'));
     }
 
+    /**
+     * This method tests countSyllables method.
+     *
+     * @author Utsav Patel
+     */
     @Test
     public void countSyllablesTest() {
         assertEquals(1, YouTubeServiceImpl.countSyllables("a"));
@@ -150,6 +183,11 @@ public class Part5Test extends WithApplication {
         assertEquals(1, YouTubeServiceImpl.countSyllables("aeiou"));
     }
 
+    /**
+     * This method tests calculateReadabilityScores method.
+     *
+     * @author Utsav Patel
+     */
     @Test
     public void calculateReadabilityScoresTest() {
         double[] calculateReadabilityScores = YouTubeServiceImpl.calculateReadabilityScores(TEXT);

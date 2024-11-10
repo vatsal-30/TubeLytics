@@ -8,6 +8,9 @@ import services.YouTubeService;
 import services.impl.VideoServiceImpl;
 import services.impl.YouTubeServiceImpl;
 
+/**
+ * @author Utsav Patel
+ */
 public class Module extends AbstractModule {
     private final Environment environment;
     private final Config config;
@@ -23,6 +26,11 @@ public class Module extends AbstractModule {
 //        bind(YouTubeService.class).toInstance(new YouTubeServiceImpl(play.libs.ws.WS.newClient(-1)));
     }
 
+    /**
+     * It is the provider for YouTubeService.
+     *
+     * @author Utsav Patel
+     */
     @Provides
     public YouTubeService provideYouTubeService(WSClient wsClient) {
         String apiKey = config.getString("youtube.api.key");

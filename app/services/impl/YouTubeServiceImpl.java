@@ -19,8 +19,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
 import services.SentimentAnalyzer;
 
+/**
+ * It is the implementation class of YouTubeService.
+ *
+ * @author Utsav Patel
+ */
 public class YouTubeServiceImpl implements YouTubeService {
 
     private final WSClient ws;
@@ -35,6 +41,13 @@ public class YouTubeServiceImpl implements YouTubeService {
         this.apiKey = apiKey;
     }
 
+    /**
+     * This method will fetch the videos from the YouTube API based on the provided keyword.
+     *
+     * @param keyword to filter out videos based on it.
+     * @return CompletionStage of Response
+     * @author Utsav Patel
+     */
     @Override
     public CompletionStage<Response> searchVideos(String keyword) {
 
@@ -159,6 +172,13 @@ public class YouTubeServiceImpl implements YouTubeService {
                 });
     }
 
+    /**
+     * This method will fetch the full description of the YouTube video using the YouTube API. 
+     *
+     * @param id id of the video
+     * @return CompletionStage of String (full description)
+     * @author Utsav Patel
+     */
     public CompletionStage<String> fetchDescription(String id) {
         return this.ws.url(YOUTUBE_VIDEO_URL)
                 .addQueryParameter("part", "snippet")
@@ -173,6 +193,15 @@ public class YouTubeServiceImpl implements YouTubeService {
                 });
     }
 
+    /**
+     * This method will calculate the readability score.
+     * Flesch-Kincaid Grade Level
+     * Flesch Reading Score
+     *
+     * @param description description of video
+     * @return double[] - It contains the readability score
+     * @author Utsav Patel
+     */
     public static double[] calculateReadabilityScores(String description) {
         if (description.isEmpty()) {
             return new double[]{0, 0};
@@ -195,6 +224,13 @@ public class YouTubeServiceImpl implements YouTubeService {
         return new double[]{fkg, frs};
     }
 
+    /**
+     * This method will calculate Syllables of the word.
+     *
+     * @param word work of description
+     * @return count of syllables
+     * @author Utsav Patel
+     */
     public static int countSyllables(String word) {
         word = word.toLowerCase().trim();
         if (word.length() == 1) {
@@ -236,14 +272,35 @@ public class YouTubeServiceImpl implements YouTubeService {
         return Math.max(syllableCount, 1);
     }
 
+    /**
+     * This method will check whether it is consonant or not.
+     *
+     * @param c character
+     * @return boolean
+     * @author Utsav Patel
+     */
     public static boolean isConsonant(char c) {
         return "bcdfghjklmnpqrstvwxyz".indexOf(c) >= 0;
     }
 
+    /**
+     * This method will split text into words
+     *
+     * @param text to split into words
+     * @return Array of String
+     * @author Utsav Patel
+     */
     public static String[] splitIntoWords(String text) {
         return text.split("\\s+");
     }
 
+    /**
+     * This method will count number of sentences.
+     *
+     * @param text to count number of sentences
+     * @return int - number of sentences
+     * @author Utsav Patel
+     */
     public static int countSentences(String text) {
         String[] sentences = text.split("[.!?;:]");
         return sentences.length;
@@ -255,13 +312,13 @@ public class YouTubeServiceImpl implements YouTubeService {
         CompletionStage<Response> responseCompletionStage = this.searchVideos(keyword);
 
         return responseCompletionStage.thenApply(response -> {
-            List<Video> videos=response.getVideos();
-            List<String> descriptions=videos.stream().map(Video::getDescription)
+            List<Video> videos = response.getVideos();
+            List<String> descriptions = videos.stream().map(Video::getDescription)
                     .collect(Collectors.toList());
 
             List<String> wordStats = calculateWordStats(descriptions);
 
-            return  wordStats;
+            return wordStats;
 
         });
 
