@@ -24,7 +24,7 @@ public class SentimentAnalyzerTest {
      */
     @Test
     public void testAnalyzeSentimentForDescription_HappySentiment() {
-        String description = "satisfied";
+        String description = "satisfied,";
         assertEquals(":-)", analyzer.analyzeSentimentForDescription(description));
     }
 
@@ -95,7 +95,7 @@ public class SentimentAnalyzerTest {
 
     /**
      *
-     * Method for handling the entire list has happy sentiments
+     * Method for handling when the entire list has happy sentiments
      * @author Vatsal Mukeshkumar Ajmeri
      */
     @Test
@@ -113,7 +113,7 @@ public class SentimentAnalyzerTest {
 
     /**
      *
-     * Method for handling the entire list has sad sentiments
+     * Method for handling when the entire list has sad sentiments
      * @author Vatsal Mukeshkumar Ajmeri
      */
     @Test
@@ -128,7 +128,7 @@ public class SentimentAnalyzerTest {
 
     /**
      *
-     * Method for handling the entire list has neutral sentiments
+     * Method for handling when the entire list has neutral sentiments
      * @author Vatsal Mukeshkumar Ajmeri
      */
     @Test
@@ -143,7 +143,7 @@ public class SentimentAnalyzerTest {
 
     /**
      *
-     * Method for handling the entire list has mixed sentiments
+     * Method for handling when the entire list has mixed sentiments
      * @author Vatsal Mukeshkumar Ajmeri
      */
     @Test
@@ -157,7 +157,7 @@ public class SentimentAnalyzerTest {
 
     /**
      *
-     * Method for handling the entire list is empty
+     * Method for handling when the entire list is empty
      * @author Vatsal Mukeshkumar Ajmeri
      */
     @Test
@@ -168,52 +168,65 @@ public class SentimentAnalyzerTest {
 
     /**
      *
-     * Method for handling the majority of list has happy sentiments
+     * Method for handling when the majority of list has happy sentiments
      * @author Vatsal Mukeshkumar Ajmeri
      */
     @Test
     public void testAnalyzeSentiment_MajorityHappySentiment() {
         List<String> descriptions = Arrays.asList(
-                "pleasure blissfulness amazing gleeful euphoric miserableness red"
+                "pleasure", "blissfulness", "amazing", "gleeful", "euphoric", "miserableness", "red"
         );
         assertEquals(":-)", analyzer.analyzeSentiment(descriptions));
     }
 
     /**
      *
-     * Method for handling the majority of list has sad sentiments
+     * Method for handling when the majority of list has sad sentiments
      * @author Vatsal Mukeshkumar Ajmeri
      */
     @Test
     public void testAnalyzeSentiment_MajoritySadSentiment() {
         List<String> descriptions = Arrays.asList(
-                "downed heartbreak sorrow anguishing distressed enthusiasm blue"
+                "downed", "heartbreak", "sorrow", "anguishing", "distressed", "enthusiasm", "blue"
         );
         assertEquals(":-(", analyzer.analyzeSentiment(descriptions));
     }
 
     /**
      *
-     * Method for handling the majority of list has neutral sentiments with minor sad sentiments
+     * Method for handling when the majority of list has neutral sentiments with minor sad sentiments
      * @author Vatsal Mukeshkumar Ajmeri
      */
     @Test
     public void testAnalyzeSentiment_MajorityNeutralSadMinorSentiment() {
         List<String> descriptions = Arrays.asList(
-                "loneliest Exuberantly Thrill mobile go red blue"
+                "loneliest", "Exuberantly", "Thrill", "mobile", "go", "red", "blue"
         );
         assertEquals(":-|", analyzer.analyzeSentiment(descriptions));
     }
 
     /**
      *
-     * Method for handling the majority of list has neutral sentiments with minor happy sentiments
+     * Method for handling when the majority of list has neutral sentiments with minor happy sentiments
      * @author Vatsal Mukeshkumar Ajmeri
      */
     @Test
     public void testAnalyzeSentiment_MajorityNeutralHappyMinorSentiment() {
         List<String> descriptions = Arrays.asList(
-                "loneliest gloominess Hopeful mobile go red blue"
+                "loneliest", "gloominess", "Hopeful", "mobile", "go", "red", "blue"
+        );
+        assertEquals(":-|", analyzer.analyzeSentiment(descriptions));
+    }
+
+    /**
+     *
+     * Method for handling when the majority of list has neutral sentiments with average happy sentiments and a few sad sentiments
+     * @author Vatsal Mukeshkumar Ajmeri
+     */
+    @Test
+    public void testAnalyzeSentiment_MajorityNeutralHappyAverageSadMinorSentiment() {
+        List<String> descriptions = Arrays.asList(
+                "lonelier", "positivity", "satisfaction", "fun", "enthusiastically", "radiant", "merrily", "mobile", "go", "red", "blue", "orange", "at", "the"
         );
         assertEquals(":-|", analyzer.analyzeSentiment(descriptions));
     }

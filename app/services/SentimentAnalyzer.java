@@ -1,9 +1,10 @@
 package services;
 
 import java.util.*;
+import java.util.regex.*;
 
 /**
- * The class that analyses the sentiments and displays the categorises into 3 categories
+ * The class analyses the sentiments and displays the categorises into 3 categories
  *
  * @author Vatsal Mukeshkumar Ajmeri
  */
@@ -85,6 +86,9 @@ public class SentimentAnalyzer {
             "pessimistic", "pessimism", "pessimistically", "pessimist"
     ));
 
+
+    private static final Pattern NON_ALPHABET_PATTERN = Pattern.compile("[^a-zA-Z]");
+
     /**
      * Analyzes the sentiment of a single description.
      *
@@ -102,7 +106,7 @@ public class SentimentAnalyzer {
             return ":-|";
         }
 
-        String[] words = description.toLowerCase().split("\\s+");
+        String[] words = NON_ALPHABET_PATTERN.matcher(description.toLowerCase()).replaceAll(" ").split("\\s+");
 
         long happyCount = Arrays.stream(words)
                 .filter(happyWords::contains)
@@ -158,13 +162,24 @@ public class SentimentAnalyzer {
 
         double happyPercentage = (double) happyCount / totalCount;
         double sadPercentage = (double) sadCount / totalCount;
+        double neutralPercentage = (double) neutralCount / totalCount;
 
-        if (happyPercentage > 0.7) {
-            return ":-)";
-        } else if (sadPercentage > 0.7) {
-            return ":-(";
-        } else {
+        if (happyPercentage == sadPercentage) {
             return ":-|";
+        } else {
+            if (happyPercentage > sadPercentage) {
+                if (happyPercentage > neutralPercentage) {
+                    return ":-)";
+                } else {
+                    return ":-|";
+                }
+            } else {
+                if (sadPercentage > neutralPercentage) {
+                    return ":-(";
+                } else {
+                    return ":-|";
+                }
+            }
         }
     }
 }
