@@ -128,7 +128,6 @@ public class SentimentAnalyzer {
         } else {
             return ":-|";
         }
-
     }
 
     /**
