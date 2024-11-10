@@ -27,7 +27,8 @@ public class YouTubeServiceImpl implements YouTubeService {
     private final String apiKey;
     private static final String YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search";
     private static final String YOUTUBE_VIDEO_URL = "https://www.googleapis.com/youtube/v3/videos";
-    private  static final String YOUTUBE_CHANNEL_URL = "https://www.googleapis.com/youtube/v3/channels";
+    private static final String YOUTUBE_CHANNEL_URL = "https://www.googleapis.com/youtube/v3/channels";
+
     @Inject
     public YouTubeServiceImpl(WSClient ws, String apiKey) {
         this.ws = ws;
@@ -59,7 +60,6 @@ public class YouTubeServiceImpl implements YouTubeService {
                                 String imageUrl = item.get("snippet").get("thumbnails").get("high").get("url").asText();
                                 String channelId = item.get("snippet").get("channelId").asText();
                                 String channelTitle = item.get("snippet").get("channelTitle").asText();
-
                                 return new Video(videoId, title, description, imageUrl, channelId, channelTitle);
                             });
                 })
@@ -107,26 +107,17 @@ public class YouTubeServiceImpl implements YouTubeService {
                         return response;
                     });
                 });
-
-//        return Source.completionStage(listCompletionStage)
-//                .flatMapConcat(Source::from)
-//                .mapAsync(2, this::fetchDescription);
-        // TODO : PART 4 AND 5
-//        return Source.completionStage(listCompletionStage)
-//                .flatMapConcat(Source::from);
         return responseStage;
     }
-
 
     //    This is my Amish Part
     public CompletionStage<ChannelProfile> getChannelProfile(String channelId) {
         return this.ws.url(YOUTUBE_CHANNEL_URL)
-                .addQueryParameter("part","snippet,statistics")
-                .addQueryParameter("id",channelId)
-                .addQueryParameter("key",apiKey)
+                .addQueryParameter("part", "snippet,statistics")
+                .addQueryParameter("id", channelId)
+                .addQueryParameter("key", apiKey)
                 .get()
                 .thenApply(response -> {
-                    // Process the response and create a ChannelProfile object
                     String name = response.asJson().get("items").get(0).get("snippet").get("title").asText();
                     String imageUrl = response.asJson().get("items").get(0).get("snippet").get("thumbnails")
                             .get("default").get("url").asText();
@@ -168,8 +159,7 @@ public class YouTubeServiceImpl implements YouTubeService {
                 });
     }
 
-
-    private CompletionStage<String> fetchDescription(String id) {
+    public CompletionStage<String> fetchDescription(String id) {
         return this.ws.url(YOUTUBE_VIDEO_URL)
                 .addQueryParameter("part", "snippet")
                 .addQueryParameter("id", id)
@@ -183,7 +173,11 @@ public class YouTubeServiceImpl implements YouTubeService {
                 });
     }
 
-    private static double[] calculateReadabilityScores(String description) {
+    public static double[] calculateReadabilityScores(String description) {
+        if (description.isEmpty()) {
+            return new double[]{0, 0};
+        }
+
         String[] words = splitIntoWords(description);
         int totalWords = words.length;
         int totalSentences = countSentences(description);
@@ -194,10 +188,6 @@ public class YouTubeServiceImpl implements YouTubeService {
             totalSyllables += countSyllables(word);
         }
 
-        if (totalWords == 0 || totalSentences == 0) {
-            return new double[]{0, 0};
-        }
-
         double wordsPerSentence = (double) totalWords / totalSentences;
         double syllablesPerWord = (double) totalSyllables / totalWords;
         double fkg = 0.39 * wordsPerSentence + 11.8 * syllablesPerWord - 15.59;
@@ -205,7 +195,7 @@ public class YouTubeServiceImpl implements YouTubeService {
         return new double[]{fkg, frs};
     }
 
-    private static int countSyllables(String word) {
+    public static int countSyllables(String word) {
         word = word.toLowerCase().trim();
         if (word.length() == 1) {
             return 1;
@@ -223,18 +213,22 @@ public class YouTubeServiceImpl implements YouTubeService {
             }
         }
 
-        if (word.length() > 2 && word.endsWith("le") && isConsonant(word.charAt(word.length() - 3))) {
-            syllableCount++;
+        if (word.length() > 2) {
+            if (word.endsWith("le")) {
+                if (isConsonant(word.charAt(word.length() - 3))) {
+                    syllableCount++;
+                }
+            }
         }
 
         if (word.endsWith("ed") && syllableCount > 1) {
-            if (word.length() > 2 && isConsonant(word.charAt(word.length() - 3))) {
+            if (isConsonant(word.charAt(word.length() - 3))) {
                 syllableCount--;
             }
         }
 
         if (word.endsWith("es") && syllableCount > 1) {
-            if (word.length() > 2 && isConsonant(word.charAt(word.length() - 3))) {
+            if (isConsonant(word.charAt(word.length() - 3))) {
                 syllableCount--;
             }
         }
@@ -242,15 +236,15 @@ public class YouTubeServiceImpl implements YouTubeService {
         return Math.max(syllableCount, 1);
     }
 
-    private static boolean isConsonant(char c) {
+    public static boolean isConsonant(char c) {
         return "bcdfghjklmnpqrstvwxyz".indexOf(c) >= 0;
     }
 
-    private static String[] splitIntoWords(String text) {
+    public static String[] splitIntoWords(String text) {
         return text.split("\\s+");
     }
 
-    private static int countSentences(String text) {
+    public static int countSentences(String text) {
         String[] sentences = text.split("[.!?;:]");
         return sentences.length;
     }

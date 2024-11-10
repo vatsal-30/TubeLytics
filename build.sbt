@@ -29,4 +29,4 @@ libraryDependencies ++= Seq(
 )
 
 enablePlugins(JacocoPlugin)
-jacocoExcludes := Seq("controllers.HomeController")
+jacocoExcludes := Seq("controllers.HomeController", "views.*", "router", "controllers.javascript")
