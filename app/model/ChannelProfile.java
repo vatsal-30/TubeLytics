@@ -2,6 +2,11 @@ package model;
 
 import java.util.List;
 
+/**
+ * it contains all the necessary information about Channel to showcase all the information on the front-end.
+ *
+ * @author Amish Navadia
+ */
 public class ChannelProfile {
     private String name;
     private String imageUrl;

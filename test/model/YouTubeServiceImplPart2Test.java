@@ -20,6 +20,10 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ *
+ * @author Karan Tanakhia
+ */
 public class YouTubeServiceImplPart2Test {
 
     @Mock
@@ -34,6 +38,11 @@ public class YouTubeServiceImplPart2Test {
     @InjectMocks
     private YouTubeServiceImpl youTubeService;
 
+    /**
+     * This constant `MOCK_JSON_RESPONSE` defines a mock JSON string that simulates a YouTube API response, including video ID, title, description, thumbnail URL, channel ID, and channel title, for testing purposes.
+     *
+     * @author Karan Tanakhia
+     */
     private static final String MOCK_JSON_RESPONSE = """
         {
             "items": [
@@ -51,6 +60,10 @@ public class YouTubeServiceImplPart2Test {
         }
     """;
 
+    /**
+     * This setup method initializes mocks for a YouTube service test, configuring a mock `WSClient` to simulate HTTP requests and responses, including JSON handling, for testing purposes.
+     * @author Karan Tanakhia
+     */
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -75,6 +88,11 @@ public class YouTubeServiceImplPart2Test {
         }
     }
 
+    /**
+     * This test verifies that `wordStatesVideos` method correctly returns a list of word statistics for a given keyword, asserting the size and specific content of the output.
+     *
+     * @author Karan Tanakhia
+     */
     @Test
     public void testWordStatesVideos_returnsWordStats() {
         String keyword = "example";

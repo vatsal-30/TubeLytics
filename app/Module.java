@@ -37,6 +37,10 @@ public class Module extends AbstractModule {
         return new YouTubeServiceImpl(wsClient, apiKey);
     }
 
+    /**
+     * It is the provider for VideoService.
+     * @author Yash Ajmeri
+     */
     @Provides
     public VideoService provideVideoService(WSClient wsClient) {
         String apiKey = config.getString("youtube.api.key");
