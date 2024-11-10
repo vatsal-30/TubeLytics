@@ -20,7 +20,10 @@ import java.util.concurrent.CompletionStage;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-
+/**
+ *
+ * @author Amish Navadia
+ */
 public class YouTubeServiceImplPart1Test {
 
     @Mock
@@ -36,14 +39,20 @@ public class YouTubeServiceImplPart1Test {
     private YouTubeServiceImpl youTubeService;
 
     private final String apiKey = "testApiKey";
-
+    /**
+     *This `setUp` method initializes mock annotations and creates an instance of `YouTubeServiceImpl` with a mock `WSClient` and an API key for testing.
+     * @author Amish Navadia
+     */
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         youTubeService = new YouTubeServiceImpl(wsClient, apiKey);
     }
 
-
+    /**
+     *This test verifies that the `getChannelProfile` method in `YouTubeService` correctly retrieves and maps the channel profile details (name, description, thumbnail, subscriber count, video count) from a simulated YouTube API JSON response.
+     * @author Amish Navadia
+     */
     @Test
     public void testGetChannelProfile() throws Exception {
         String channelId = "channel123";
@@ -89,7 +98,10 @@ public class YouTubeServiceImplPart1Test {
         assertNotNull(profile.getVideos());
         assertTrue(profile.getVideos().isEmpty());
     }
-
+    /**
+     *This test verifies that the `getChannelVideos` method in `YouTubeService` correctly retrieves and maps video details (ID, title, description, thumbnail, channel title) for a given channel, based on a simulated YouTube API JSON response.
+     * @author Amish Navadia
+     */
     @Test
     public void testGetChannelVideos() throws Exception {
         String channelId = "channel123";

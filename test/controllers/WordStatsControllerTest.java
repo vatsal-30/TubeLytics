@@ -18,6 +18,9 @@ import static org.mockito.Mockito.when;
 import static play.mvc.Http.Status.OK;
 import static play.test.Helpers.contentAsString;
 
+/**
+ * @author Karan Tanakhia
+ */
 public class WordStatsControllerTest {
 
     @Mock
@@ -31,6 +34,11 @@ public class WordStatsControllerTest {
         MockitoAnnotations.initMocks(this);
     }
 
+    /**
+     * This method tests wordstats for the given keyword.
+     *
+     * @author Karan Tanakhia
+     */
     @Test
     public void testGetWordStats_validKeyword() {
         // Arrange
@@ -55,9 +63,8 @@ public class WordStatsControllerTest {
         assert content.contains("<td>word2</td>");
         assert content.contains("<td>3</td>");
         assert content.contains("<td>word3</td>");
-        assert content.contains("<td>1</td>");// Verify HTML contains keyword
+        assert content.contains("<td>1</td>");
         for (String stat : mockWordStats) {
-//            assert content.contains(stat); // Verify HTML contains each word stat
             assert content.contains(stat.split(":")[0]);  // Check word (e.g., "word1")
             assert content.contains(stat.split(":")[1].trim());
         }

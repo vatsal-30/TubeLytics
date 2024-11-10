@@ -30,6 +30,10 @@ public class Video {
         this.channelTitle = channelTitle;
     }
 
+    /**
+     * This is a Parameterized Constructor .
+     * @author Yash Ajmeri
+     */
     public Video(String videoId, String title, String description, String imageUrl, String channelId, String channelTitle, String tags) {
         this.videoId = videoId;
         this.title = title;

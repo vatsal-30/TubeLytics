@@ -28,7 +28,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static play.mvc.Http.Status.OK;
 import static play.test.Helpers.contentAsString;
-
+/**
+ *
+ * @author Yash Ajmeri
+ */
 public class YouTubeController2Test {
 
     @Mock
@@ -50,6 +53,10 @@ public class YouTubeController2Test {
     private final String CHANNEL_ID = "sample_channel_id";
     private final String SEARCH_KEYWORD = "sample_keyword";
 
+    /**
+     *This `setUp` method initializes mock annotations and configures the mock `formFactory` to return a `SearchForm` instance when the `form` method is called with `SearchForm.class`, for testing purposes.
+     * @author Yash Ajmeri
+     */
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -58,7 +65,10 @@ public class YouTubeController2Test {
 
 
 
-
+    /**
+     *This test checks that the `showVideoDetails` method in `YouTubeController` correctly retrieves and displays video details, verifying that the response status is OK and the content is not null.
+     * @author Yash Ajmeri
+     */
 
 
     @Test
@@ -72,7 +82,10 @@ public class YouTubeController2Test {
         assertEquals(OK, result.status());
         assertNotNull(contentAsString(result));
     }
-
+    /**
+     *This test verifies that the `searchTags` method in `YouTubeController` correctly retrieves and displays search results for a given tag, asserting an OK status and non-null content in the response.
+     * @author Yash Ajmeri
+     */
     @Test
     public void testSearchTags() throws Exception {
         Response mockResponse = new Response();
@@ -87,7 +100,10 @@ public class YouTubeController2Test {
         assertEquals(OK, result.status());
         assertNotNull(contentAsString(result));
     }
-
+    /**
+     *This test confirms that the `channelProfile` method in `YouTubeController` correctly retrieves and displays a channel profile and its videos, checking for an OK status and non-null content in the response.
+     * @author Amish Navadia
+     */
     @Test
     public void testChannelProfile() throws Exception {
         ChannelProfile mockProfile = new ChannelProfile("Sample Channel", "https://example.com/channel.jpg", "Channel description", "1000", "50", List.of());
