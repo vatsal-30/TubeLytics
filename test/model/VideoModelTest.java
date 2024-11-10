@@ -25,4 +25,25 @@ public class VideoModelTest {
         Assert.assertEquals(Double.valueOf(6.2), video.getFleschKincaidGradeLevel());
         Assert.assertEquals(Double.valueOf(65.0), video.getFleschReadingScore());
     }
+
+    @Test
+    public void testVideoSetters() {
+        Video newVideo = new Video();
+        newVideo.setVideoId(video.getVideoId());
+        Assert.assertEquals("vid-001", newVideo.getVideoId());
+        newVideo.setTitle(video.getTitle());
+        Assert.assertEquals("Understanding the Basics of Reading Levels", newVideo.getTitle());
+        newVideo.setDescription(video.getDescription());
+        Assert.assertEquals("An introduction to understanding reading levels and their impact on learning", newVideo.getDescription());
+        newVideo.setImageUrl(video.getImageUrl());
+        Assert.assertEquals("https://example.com/image1.jpg", newVideo.getImageUrl());
+        newVideo.setChannelId(video.getChannelId());
+        Assert.assertEquals("channel-001", newVideo.getChannelId());
+        newVideo.setChannelTitle(video.getChannelTitle());
+        Assert.assertEquals("Education Today", newVideo.getChannelTitle());
+
+        Video otherVideo = new Video(video.getVideoId(), video.getTitle(), video.getDescription(), video.getImageUrl(), video.getChannelId(), video.getChannelTitle(), "tag1, tag2");
+        newVideo.setTags(otherVideo.getTags());
+        Assert.assertEquals("tag1, tag2", newVideo.getTags());
+    }
 }

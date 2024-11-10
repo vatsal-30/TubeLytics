@@ -11,7 +11,7 @@ public class Video {
     private String channelId;
     private String channelTitle;
     private Double fleschKincaidGradeLevel;
-    private Double FleschReadingScore;
+    private Double fleschReadingScore;
 
     private String tags;
 
@@ -34,7 +34,7 @@ public class Video {
         this.imageUrl = imageUrl;
         this.channelId = channelId;
         this.channelTitle = channelTitle;
-        this.tags=tags;
+        this.tags = tags;
     }
 
     public String getVideoId() {
@@ -103,10 +103,10 @@ public class Video {
     }
 
     public Double getFleschReadingScore() {
-        return FleschReadingScore;
+        return fleschReadingScore;
     }
 
     public void setFleschReadingScore(Double fleschReadingScore) {
-        FleschReadingScore = fleschReadingScore;
+        this.fleschReadingScore = fleschReadingScore;
     }
 }

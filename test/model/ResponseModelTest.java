@@ -15,6 +15,7 @@ public class ResponseModelTest {
         response.setQuery("Sample query about education and learning");
         response.setAverageFleschKincaidGradeLevel(7.9);
         response.setAverageFleschReadingScore(70.37);
+        response.setSentiment(":-)");
         response.setVideos(new ArrayList<>());
 
         Video video = new Video("vid-001", "Understanding the Basics of Reading Levels", "An introduction to understanding reading levels and their impact on learning", "https://example.com/image1.jpg", "channel-001", "Education Today");
@@ -39,6 +40,7 @@ public class ResponseModelTest {
         Assert.assertEquals(Double.valueOf(7.9), response.getAverageFleschKincaidGradeLevel());
         Assert.assertEquals(Double.valueOf(70.37), response.getAverageFleschReadingScore());
         Assert.assertNotNull(response.getVideos());
+        Assert.assertEquals(":-)", response.getSentiment());
         Assert.assertEquals(3, response.getVideos().size());
     }
 

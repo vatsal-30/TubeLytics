@@ -9,7 +9,6 @@ import play.mvc.Http;
 import play.mvc.Result;
 import services.YouTubeService;
 import services.VideoService;
-import model.Video;
 
 import javax.inject.Inject;
 
@@ -39,7 +38,6 @@ public class YouTubeController extends Controller {
                 .thenApply(response -> ok(Json.toJson(response)));
     }
 
-
     public CompletionStage<Result> showVideoDetails(String videoId) {
         return videoService.getVideoById(videoId)
                 .thenApply(video -> ok(views.html.videoDetailsPage.render(video)));
@@ -48,7 +46,6 @@ public class YouTubeController extends Controller {
     public CompletionStage<Result> searchTags(String searchTag) {
         return youTubeService.searchVideos(searchTag)
                 .thenApply(response -> ok(views.html.taggedVideo.render(response)));
-
     }
 
     // Method to get channel profile
@@ -62,6 +59,5 @@ public class YouTubeController extends Controller {
                                 return ok(views.html.channelProfile.render(channelProfile)); // Pass to the view
                             });
                 });
-
     }
 }
