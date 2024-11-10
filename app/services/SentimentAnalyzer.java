@@ -88,6 +88,10 @@ public class SentimentAnalyzer {
      */
     public String analyzeSentimentForDescription(String description) {
 
+        if(description.isEmpty()){
+            return ":-|";
+        }
+
         String[] words = description.toLowerCase().split("\\s+");
 
         long happyCount = Arrays.stream(words)
@@ -99,10 +103,6 @@ public class SentimentAnalyzer {
                 .count();
 
         long totalWords = words.length;
-
-        if (totalWords == 0) {
-            return ":-|";
-        }
 
         double happyPercentage = (double) happyCount / totalWords;
         double sadPercentage = (double) sadCount / totalWords;
