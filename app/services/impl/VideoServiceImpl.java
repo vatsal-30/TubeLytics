@@ -11,6 +11,11 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+/**
+ * It is the implementation class of VideoService.
+ *
+ * @author Yash Ajmeri
+ */
 public class VideoServiceImpl implements VideoService {
     private final WSClient ws;
     private final String apiKey;
@@ -23,6 +28,11 @@ public class VideoServiceImpl implements VideoService {
         this.apiKey = apiKey;
     }
 
+    /**
+     * This method will fetch the videos from the YouTube API based on the provided videoId.
+     *
+     * @author Yash Ajmeri
+     */
     @Override
     public CompletionStage<Video> getVideoById(String videoId) {
         return this.ws.url(YOUTUBE_VIDEO_URL)

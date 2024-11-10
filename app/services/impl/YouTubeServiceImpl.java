@@ -123,7 +123,11 @@ public class YouTubeServiceImpl implements YouTubeService {
         return responseStage;
     }
 
-    //    This is my Amish Part
+    /**
+     * This method will fetch the Channel profile from the YouTube API based on the provided channelId.
+     *
+     * @author Amish Navadia
+     */
     public CompletionStage<ChannelProfile> getChannelProfile(String channelId) {
         return this.ws.url(YOUTUBE_CHANNEL_URL)
                 .addQueryParameter("part", "snippet,statistics")
@@ -145,6 +149,11 @@ public class YouTubeServiceImpl implements YouTubeService {
                 });
     }
 
+    /**
+     * This method will fetch the Channel's latest 10 video from the YouTube API based on the provided channelId.
+     *
+     * @author Amish Navadia
+     */
     @Override
     public CompletionStage<List<Video>> getChannelVideos(String channelId, int i) {
         return this.ws.url(YOUTUBE_SEARCH_URL)
@@ -306,6 +315,11 @@ public class YouTubeServiceImpl implements YouTubeService {
         return sentences.length;
     }
 
+    /**
+     * This method will fetch the videos from the YouTube API based on the provided keyword and then return the list of word and it's frequency from the all videos description .
+     *
+     * @author Karan Tanakhia
+     */
     @Override
     public CompletionStage<List<String>> wordStatesVideos(String keyword) {
 
@@ -324,23 +338,22 @@ public class YouTubeServiceImpl implements YouTubeService {
 
     }
 
+    /**
+     * This method will generate list string which contains the unique words and it's frequency form all the videos description and sort according to the descending order.
+     *
+     * @author Karan Tanakhia
+     */
     private List<String> calculateWordStats(List<String> descriptions) {
         Map<String, Long> wordCounts = descriptions.stream()
-                .flatMap(description -> Stream.of(description.split("\\W+"))) // Split on non-word characters
-                .map(String::toLowerCase) // Convert to lowercase
-                .filter(word -> !word.isEmpty()) // Remove empty words
-                .collect(Collectors.groupingBy(word -> word, Collectors.counting())); // Count frequencies
+                .flatMap(description -> Stream.of(description.split("\\W+")))
+                .map(String::toLowerCase)
+                .filter(word -> !word.isEmpty())
+                .collect(Collectors.groupingBy(word -> word, Collectors.counting()));
 
-        // Build a string representation of the word stats
-//        StringBuilder statsBuilder = new StringBuilder();
-//        wordCounts.entrySet().stream()
-//                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue())) // Sort by frequency
-//                .forEach(entry -> statsBuilder.append(entry.getKey()).append(": ").append(entry.getValue()).append("<br>"));
-//
-//        return statsBuilder.toString();
+
         return wordCounts.entrySet().stream()
-                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue())) // Sort by frequency
-                .map(entry -> entry.getKey() + ": " + entry.getValue()) // Format each entry as "word: count"
+                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
+                .map(entry -> entry.getKey() + ": " + entry.getValue())
                 .collect(Collectors.toList());
     }
 }

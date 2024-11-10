@@ -51,16 +51,31 @@ public class YouTubeController extends Controller {
                 .thenApply(response -> ok(Json.toJson(response)));
     }
 
+    /**
+     * This will return the JSON response of the Video class based on the videoID.
+     *
+     * @author Yash Ajmeri
+     */
     public CompletionStage<Result> showVideoDetails(String videoId) {
         return videoService.getVideoById(videoId)
                 .thenApply(video -> ok(views.html.videoDetailsPage.render(video)));
     }
 
+    /**
+     * This will return the JSON response of the Response class based on the tags.
+     *
+     * @author Yash Ajmeri
+     */
     public CompletionStage<Result> searchTags(String searchTag) {
         return youTubeService.searchVideos(searchTag)
                 .thenApply(response -> ok(views.html.taggedVideo.render(response)));
     }
 
+    /**
+     * This will return the JSON response of the Video class based on the ChannelId.
+     *
+     * @author Amish Navadia
+     */
     // Method to get channel profile
     public CompletionStage<Result> channelProfile(String channelId) {
 

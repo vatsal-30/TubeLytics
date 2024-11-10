@@ -20,7 +20,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-
+/**
+ *
+ * @author Yash Ajmeri
+ */
 public class VideoServiceImplTest {
 
     @Mock
@@ -38,12 +41,19 @@ public class VideoServiceImplTest {
     private final String apiKey = "testApiKey";
     private static final String VIDEO_ID = "sample_video_id";
 
+    /**
+     *This `setUp` method initializes the mock annotations and creates an instance of `VideoServiceImpl` with a mock `WSClient` and an API key for testing.
+     * @author Yash Ajmeri
+     */
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         videoService = new VideoServiceImpl(wsClient, apiKey);
     }
-
+    /**
+     *This test verifies that the `getVideoById` method in `VideoService` correctly retrieves and maps video details (like title, description, thumbnail URL, channel info, and tags) from a simulated YouTube API JSON response.
+     * @author Yash Ajmeri
+     */
     @Test
     public void testGetVideoById() throws Exception {
         // Sample JSON response from YouTube API
