@@ -2,6 +2,11 @@ package services;
 
 import java.util.*;
 
+/**
+ * The class that analyses the sentiments and displays the categorises into 3 categories
+ *
+ * @author Vatsal Mukeshkumar Ajmeri
+ */
 public class SentimentAnalyzer {
 
     private static final Set<String> happyWords = new HashSet<>(Arrays.asList(
@@ -85,6 +90,11 @@ public class SentimentAnalyzer {
      *
      * @param description The description to analyze.
      * @return A string representing the sentiment ("Happy", "Sad", or "Neutral").
+     *
+     *
+     * The method analyses the description string of each video taken as an input
+     *
+     * @author Vatsal Mukeshkumar Ajmeri
      */
     public String analyzeSentimentForDescription(String description) {
 
@@ -122,6 +132,11 @@ public class SentimentAnalyzer {
      *
      * @param descriptions List of descriptions to analyze.
      * @return A string representing the overall sentiment ("Happy", "Sad", or "Neutral").
+     */
+    /**
+     * This method runs on the descriptions of all videos and calculates the overall sentiment of the video search results
+     *
+     * @author Vatsal Mukeshkumar Ajmeri
      */
     public String analyzeSentiment(List<String> descriptions) {
         long happyCount = descriptions.stream()
