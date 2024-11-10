@@ -73,12 +73,14 @@
     <div class="video-thumbnail">
         <img src="@video.getImageUrl()" alt="Video Thumbnail" class="thumbnail-image">
     </div>
+    <a href="https://www.youtube.com/watch?v=@video.getVideoId()" target="_blank">
+        <h1 class="video-title">@video.getTitle()</h1>
+    </a>
 
-    <h1 class="video-title">@video.getTitle()</h1>
 
     <div class="video-info">
         <p><strong>Channel:</strong>
-            <a href="https://www.youtube.com/channel/@video.getChannelId()" target="_blank" class="channel-link">@video.getChannelTitle()</a>
+            <a href="/channel/@video.getChannelId()" target="_blank" class="channel-link">@video.getChannelTitle()</a>
         </p>
         <p><strong>Description:</strong> @video.getDescription()</p>
 
