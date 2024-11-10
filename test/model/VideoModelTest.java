@@ -4,9 +4,17 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * @author Utsav Patel
+ */
 public class VideoModelTest {
     private Video video;
 
+    /**
+     * This method sets up a dummy Video object to test its constructors, getters, and setters.
+     *
+     * @author Utsav Patel
+     */
     @Before
     public void setUp() {
         this.video = new Video("vid-001", "Understanding the Basics of Reading Levels", "An introduction to understanding reading levels and their impact on learning", "https://example.com/image1.jpg", "channel-001", "Education Today");
@@ -14,6 +22,11 @@ public class VideoModelTest {
         this.video.setFleschReadingScore(65.0);
     }
 
+    /**
+     * This method tests Video object.
+     *
+     * @author Utsav Patel
+     */
     @Test
     public void testVideo() {
         Assert.assertEquals("vid-001", video.getVideoId());
@@ -26,6 +39,11 @@ public class VideoModelTest {
         Assert.assertEquals(Double.valueOf(65.0), video.getFleschReadingScore());
     }
 
+    /**
+     * This method tests Video object setters.
+     *
+     * @author Utsav Patel
+     */
     @Test
     public void testVideoSetters() {
         Video newVideo = new Video();

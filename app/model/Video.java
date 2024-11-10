@@ -1,8 +1,11 @@
 package model;
 
-import java.util.Arrays;
-import java.util.List;
 
+/**
+ * It contains all the necessary information about Video.
+ *
+ * @author Utsav Patel
+ */
 public class Video {
     private String videoId;
     private String title;

@@ -14,6 +14,9 @@ import javax.inject.Inject;
 
 import java.util.concurrent.CompletionStage;
 
+/**
+ * @author Utsav Patel
+ */
 public class YouTubeController extends Controller {
     private final YouTubeService youTubeService;
     private final VideoService videoService;
@@ -26,10 +29,20 @@ public class YouTubeController extends Controller {
         this.searchForm = formFactory.form(SearchForm.class);
     }
 
+    /**
+     * This method will render the index page, which contains a search field.
+     *
+     * @author Utsav Patel
+     */
     public Result index(Http.Request request) {
         return ok(views.html.index.render(searchForm, request));
     }
 
+    /**
+     * This will return the JSON response of the Response class based on the search query.
+     *
+     * @author Utsav Patel
+     */
     public CompletionStage<Result> search(Http.Request request) {
         SearchForm form = searchForm.bindFromRequest(request).get();
         String keyword = form.getQuery();

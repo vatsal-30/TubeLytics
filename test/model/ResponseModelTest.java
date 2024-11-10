@@ -6,9 +6,17 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
+/**
+ * @author Utsav Patel
+ */
 public class ResponseModelTest {
     private Response response;
 
+    /**
+     * This method sets up a dummy Response object to test its constructors, getters, and setters.
+     *
+     * @author Utsav Patel
+     */
     @Before
     public void setUp() {
         response = new Response();
@@ -34,8 +42,13 @@ public class ResponseModelTest {
         response.getVideos().add(video);
     }
 
+    /**
+     * This method tests Response object.
+     *
+     * @author Utsav Patel
+     */
     @Test
-    public void responseTest(){
+    public void responseTest() {
         Assert.assertEquals("Sample query about education and learning", response.getQuery());
         Assert.assertEquals(Double.valueOf(7.9), response.getAverageFleschKincaidGradeLevel());
         Assert.assertEquals(Double.valueOf(70.37), response.getAverageFleschReadingScore());

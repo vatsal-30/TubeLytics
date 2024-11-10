@@ -1,6 +1,4 @@
 
-package services.impl;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import model.ChannelProfile;
 import model.Response;
@@ -13,6 +11,7 @@ import org.mockito.MockitoAnnotations;
 import play.libs.ws.WSClient;
 import play.libs.ws.WSRequest;
 import play.libs.ws.WSResponse;
+import services.impl.YouTubeServiceImpl;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

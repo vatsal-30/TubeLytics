@@ -17,6 +17,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
+/**
+ * @author Utsav Patel
+ */
 public class ModuleTest {
     @Mock
     private WSClient wsClient;
@@ -27,12 +30,22 @@ public class ModuleTest {
     @InjectMocks
     private Module module;
 
+    /**
+     * This method sets up a dummy Config object.
+     *
+     * @author Utsav Patel
+     */
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         when(config.getString("youtube.api.key")).thenReturn("API_KEY");
     }
 
+    /**
+     * This method tests YouTubeService Provider.
+     *
+     * @author Utsav Patel
+     */
     @Test
     public void youTubeServiceProviderTest() {
         YouTubeService youtubeService = module.provideYouTubeService(wsClient);
@@ -43,6 +56,11 @@ public class ModuleTest {
         verify(config).getString("youtube.api.key");
     }
 
+    /**
+     * This method tests VideoService Provider.
+     *
+     * @author Utsav Patel
+     */
     @Test
     public void videoServiceProviderTest() {
         VideoService videoService = module.provideVideoService(wsClient);
