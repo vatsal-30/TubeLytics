@@ -2,6 +2,7 @@ package actor;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
 import akka.actor.Props;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -11,7 +12,9 @@ import model.Video;
 import play.libs.ws.WSClient;
 import play.libs.ws.WSRequest;
 import play.libs.ws.WSResponse;
+import scala.jdk.javaapi.FutureConverters;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -45,17 +48,18 @@ public class UserActor extends AbstractActor {
                     if (!searchHistory.contains(message)) {
                         searchHistory.add(message);
                     }
-                    // TODO: Forward call to the search API
                     // TODO: Then Sentiment
-                    // TODO: Then Description Readability
-//                    CompletableFuture.supplyAsync(() -> {
-//                        // TODO
-//                        return "Async Processed: " + message;
-//                    }).thenAccept(response -> actorRef.tell(response, getSelf()));
                     this.searchVideos(message)
                             .toCompletableFuture()
                             .thenAccept(response -> {
-                                actorRef.tell(serializeResponse(response), getSelf());
+                                this.calculateScore(response)
+                                        .thenAccept(responseWithScore -> {
+                                            if (responseWithScore != null) {
+                                                actorRef.tell(serializeResponse(responseWithScore), getSelf());
+                                            } else {
+                                                actorRef.tell(serializeResponse(response), getSelf());
+                                            }
+                                        });
                             });
                 })
                 .match(SupervisorActor.NotifyClient.class, notifyClient -> {
@@ -70,18 +74,6 @@ public class UserActor extends AbstractActor {
                 })
                 .build();
     }
-
-//    private CompletableFuture<Response> searchVideosDummy(String message) {
-//        return CompletableFuture.supplyAsync(() -> {
-//            Response response = new Response();
-//            response.setQuery("Sample query about education and learning");
-//            response.setAverageFleschKincaidGradeLevel(7.9);
-//            response.setAverageFleschReadingScore(70.37);
-//            response.setSentiment(":-)");
-//            response.setVideos(new ArrayList<>());
-//            return response;
-//        });
-//    }
 
     public CompletionStage<Response> searchVideos(String keyword) {
         WSRequest request = ws.url(YOUTUBE_SEARCH_URL)
@@ -145,15 +137,19 @@ public class UserActor extends AbstractActor {
                 });
     }
 
-//    public CompletionStage<Response> calculateScore(Response response) {
-//        FutureConverters.asJava(ask(supervisorRef, message, 2000))
-//                .thenApply(response -> {
-//                    if (response instanceof Response) {
-//                        getSender().tell(serializeResponse((Response) response), getSelf());
-//                    }
-//                    return null;
-//                });
-//    }
+    public CompletionStage<Response> calculateScore(Response response) {
+        String actorPath = "akka://application/user/descriptionReadability";
+        ActorSelection actorSelection = context().actorSelection(actorPath);
+
+        return actorSelection.resolveOne(Duration.ofSeconds(2)).toCompletableFuture()
+                .thenCompose(actorRef -> FutureConverters.asJava(ask(actorRef, response, 2000))
+                        .thenApply(calculatedDescriptionScoreResponse -> {
+                            if (calculatedDescriptionScoreResponse instanceof Response) {
+                                return (Response) calculatedDescriptionScoreResponse;
+                            }
+                            return null;
+                        }));
+    }
 
     public String serializeResponse(Response response) {
         ObjectMapper mapper = new ObjectMapper();

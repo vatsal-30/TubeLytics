@@ -47,16 +47,6 @@ public class SupervisorActor extends AbstractActor {
                         userActors.get(actorRef).tell(notifyClient, getSelf());
                     }
                 })
-//                .match(Response.class, response -> {
-//                    ActorRef webSocketRef = webSocketActors.get(getSender());
-//                    if (webSocketRef != null) {
-//                        webSocketRef.tell(response, getSelf());
-//                    }
-//                })
-//                .match(String.class, message -> userActors.get(getSender()) != null, message -> {
-//                    ActorRef userActor = userActors.get(getSender());
-//                    userActor.forward(message, getContext());
-//                })
                 .matchAny(message -> {
                     if (message instanceof String) {
                         ActorRef userActor = userActors.get(getSender());

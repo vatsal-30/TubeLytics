@@ -21,7 +21,7 @@ public class TimeActor extends AbstractActorWithTimers {
         getTimers().startPeriodicTimer(
                 "Timer",
                 new Tick(),
-                Duration.create(5, TimeUnit.SECONDS));
+                Duration.create(45, TimeUnit.SECONDS));
     }
 
     @Override

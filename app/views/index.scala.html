@@ -32,7 +32,6 @@
                         const socket = new WebSocket("@routes.YouTubeController.ws().webSocketURL(request)");
 
                         socket.onmessage = function (event) {
-                            console.log(event.data);
                             const response = JSON.parse(event.data);
                             appendMessage(response);
                         };
