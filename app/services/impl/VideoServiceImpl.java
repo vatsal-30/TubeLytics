@@ -58,10 +58,7 @@ public class VideoServiceImpl implements VideoService {
                         tags = tags.substring(1, tags.length()-1).replace("\"", "");
                     }
 
-
-
                     return new Video(videoId, title, description, imageUrl, channelId, channelTitle,tags);
-
                 });
     }
 

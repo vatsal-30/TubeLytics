@@ -3,58 +3,76 @@
 @(searchForm: Form[SearchForm])(implicit request: Request)
 
 @main("Welcome to Play") {
-<!--  <h1>Welcome to Play!</h1>-->
+    <!--  <h1>Welcome to Play!</h1>-->
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YT Lytics</title>
-    <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")">
-</head>
-<body>
-<div class="container">
-    <h1>Welcome to YT lytics</h1>
-    @helper.form(routes.YouTubeController.search) {
-    @helper.CSRF.formField
-    <div class="search-bar">
-        <input type="text" name="query" placeholder="Enter search terms"/>
-        <button type="submit">Go!</button>
-    </div>
-    }
-</div>
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>YT Lytics</title>
+            <link rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")">
+        </head>
+        <body>
+            <div class="container">
+                <h1>Welcome to YT lytics</h1>
+                <form>
+                    <div class="search-bar">
+                        <input type="text" name="query" placeholder="Enter search terms"/>
+                        <button type="submit">Go!</button>
+                    </div>
+                </form>
+            </div>
 
-<div id="resultsContainer">
+            <div id="resultsContainer">
+                <div id="results"></div>
+            </div>
 
-    <div id="results"></div>
-</div>
+            <script>
+                    $(document).ready(function () {
+                        const socket = new WebSocket("@routes.YouTubeController.ws().webSocketURL(request)");
 
-<script>
-    $(document).ready(function () {
-        $('form').on('submit', function (event) {
-            event.preventDefault();
-            const query = $('input[name="query"]').val();
-            $.ajax({
-                url: $(this).attr('action'),
-                type: 'POST',
-                data: $(this).serialize(),
-                headers: {'Csrf-Token': $('input[name="csrfToken"]').val()}, // Set CSRF header
-                success: function (response) {
+                        socket.onmessage = function (event) {
+                            console.log(event.data);
+                            const response = JSON.parse(event.data);
+                            appendMessage(response);
+                        };
 
+                        socket.onerror = function (error) {
+                            console.error("WebSocket error:", error);
+                            alert("WebSocket error occurred.");
+                        };
 
+                        socket.onclose = function () {
+                            alert("WebSocket connection closed.");
+                        };
 
-                    let searchGroup=`
-                    <div class="result">
+                        $('form').on('submit', function (event) {
+                            event.preventDefault();
+                            console.log(event);
+                            const query = $('input[name="query"]').val();
+                            console.log("query " + query);
+
+                            if (query && socket.readyState === WebSocket.OPEN) {
+                                console.log("Sending message");
+                                socket.send(query);
+                            } else if (socket.readyState !== WebSocket.OPEN) {
+                                alert("WebSocket is not connected.");
+                            }
+                        })
+
+                        const appendMessage = (response) => {
+                            let searchGroup = `
+                        <div class="result">
                         <div class="search-terms">
-                            <p>Search terms: ${query} : ${response.sentiment}</p>
+                            <p>Search terms: ${response.query} : ${response.sentiment}</p>
                             <p>Flesch-Kincaid Grade Level Avg. = ${response.averageFleschKincaidGradeLevel}, Flesch Reading Ease Score Avg. = ${response.averageFleschReadingScore}</p>
-                            <a href="/wordStats/${encodeURIComponent(query)}" class="tags-link" target="blank">More Stats</a>
+                            <a href="/wordStats/${encodeURIComponent(response.query)}" class="tags-link" target="blank">More Stats</a>
                         </div>
                     `;
 
-                response.videos.slice(0, 10).forEach(
-                (video, index) => { // Limit to 10 results
-                    searchGroup+=`
+                            response.videos.slice(0, 10).forEach(
+                                    (video, index) => { // Limit to 10 results
+                                        searchGroup += `
                         <div class="video-result">
                             <div class="video-info">
                                 <div class="video-text">
@@ -65,7 +83,6 @@
                                     <strong>Description:</strong> ${video.description} |
                                     Flesch-Kincaid Grade Level = ${video.fleschKincaidGradeLevel}, Flesch Reading Ease Score = ${video.fleschReadingScore}.
                                     <a href="/ytlytics/video/${encodeURIComponent(video.videoId)}" class="tags-link" target="_blank" >Tags</a>
-
                                 </div>
 
 
@@ -76,22 +93,15 @@
                             </div>
                         </div>
                     `;
-                    searchGroup += `</div>`;
+                                        searchGroup += `</div>`;
 
-                });
-                    $('#results').prepend(searchGroup);
+                                    });
+                            $('#results').prepend(searchGroup);
+                        }
+                    })
 
-
-                },
-                error: function () {
-                    alert("Error submitting data.");
-                }
-            });
-        })
-    })
-
-</script>
-</body>
-</html>
+            </script>
+        </body>
+    </html>
 
 }

@@ -3,8 +3,10 @@
 # ~~~~
 
 # An example controller showing a sample home page
-#GET     /                           controllers.HomeController.index()
 GET     /              controllers.YouTubeController.index(request: Request)
+
+GET     /ws            controllers.YouTubeController.ws()
+
 
 GET     /ytlytics                   controllers.YouTubeController.index(request: Request)
 
@@ -15,8 +17,6 @@ GET     /assets/*file               controllers.Assets.versioned(path="/public",
 
 # Route to display video details by video ID
 GET     /ytlytics/video/:videoId   controllers.YouTubeController.showVideoDetails(videoId: String)
-
-GET     /search/:query             controllers.YouTubeController.searchTags(query: String)
 
 # Route to search by tag with query parameter
 GET     /tags                       controllers.YouTubeController.searchTags(tag: String)
