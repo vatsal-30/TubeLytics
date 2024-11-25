@@ -1,17 +1,30 @@
 package controllers;
 
+import actor.DescriptionReadabilityActor;
+import actor.SupervisorActor;
+import actor.TimeActor;
+import actor.WebSocketActor;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.Props;
+import akka.stream.Materializer;
+import com.typesafe.config.Config;
 import model.SearchForm;
 import play.data.Form;
 import play.data.FormFactory;
 import play.libs.Json;
+import play.libs.streams.ActorFlow;
+import play.libs.ws.WSClient;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
+import play.mvc.WebSocket;
 import services.YouTubeService;
 import services.VideoService;
 
 import javax.inject.Inject;
 
+import java.util.UUID;
 import java.util.concurrent.CompletionStage;
 
 /**
@@ -20,13 +33,25 @@ import java.util.concurrent.CompletionStage;
 public class YouTubeController extends Controller {
     private final YouTubeService youTubeService;
     private final VideoService videoService;
+    private final ActorSystem actorSystem;
+    private final Materializer materializer;
+    private final WSClient wsClient;
+    private final String API_KEY;
     private final Form<SearchForm> searchForm;
+    private final ActorRef supervisorActor;
 
     @Inject
-    public YouTubeController(YouTubeService youTubeService, FormFactory formFactory, VideoService videoService) {
+    public YouTubeController(YouTubeService youTubeService, FormFactory formFactory, VideoService videoService, ActorSystem actorSystem, Materializer materializer, WSClient wsClient, Config config) {
         this.youTubeService = youTubeService;
         this.videoService = videoService;
         this.searchForm = formFactory.form(SearchForm.class);
+        this.actorSystem = actorSystem;
+        this.materializer = materializer;
+        this.wsClient = wsClient;
+        this.API_KEY = config.getString("youtube.api.key");
+        actorSystem.actorOf(TimeActor.getProps(), "timeActor");
+        actorSystem.actorOf(DescriptionReadabilityActor.props(), "descriptionReadability");
+        this.supervisorActor = actorSystem.actorOf(SupervisorActor.props(wsClient, API_KEY), "supervisor");
     }
 
     /**
@@ -49,6 +74,20 @@ public class YouTubeController extends Controller {
         return youTubeService
                 .searchVideos(keyword)
                 .thenApply(response -> ok(Json.toJson(response)));
+    }
+
+    public WebSocket ws() {
+        return WebSocket.Text.accept(request -> ActorFlow.actorRef(
+                actorRef -> {
+                    String ID = UUID.randomUUID().toString();
+                    Props webSocketProps = WebSocketActor.props(this.supervisorActor, ID, actorRef);
+                    ActorRef webSocketActor = actorSystem.actorOf(webSocketProps, "websocket-" + ID);
+                    supervisorActor.tell(new WebSocketActor.NewConnection(webSocketActor), actorRef);
+                    return webSocketProps;
+                },
+                actorSystem,
+                materializer
+        ));
     }
 
     /**
