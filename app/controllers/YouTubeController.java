@@ -51,7 +51,7 @@ public class YouTubeController extends Controller {
         this.API_KEY = config.getString("youtube.api.key");
         actorSystem.actorOf(TimeActor.getProps(), "timeActor");
         actorSystem.actorOf(DescriptionReadabilityActor.props(), "descriptionReadability");
-        this.supervisorActor = actorSystem.actorOf(SupervisorActor.props(wsClient, API_KEY), "supervisor");
+        this.supervisorActor = actorSystem.actorOf(SupervisorActor.props(this.wsClient, API_KEY), "supervisor");
     }
 
     /**
