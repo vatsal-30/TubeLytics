@@ -46,6 +46,12 @@ public class UserActor extends AbstractActor {
         return receiveBuilder()
                 .match(String.class, message -> {
                     if (!searchHistory.contains(message)) {
+                        if (searchHistory.size() >= 10) {
+                            searchHistory.removeFirst();
+                        }
+                        searchHistory.add(message);
+                    } else {
+                        searchHistory.remove(message);
                         searchHistory.add(message);
                     }
                     // TODO: Then Sentiment
