@@ -74,7 +74,14 @@ public class UserActor extends AbstractActor {
                                 searchVideos(keyword)
                                         .toCompletableFuture()
                                         .thenAccept(response -> {
-                                            actorRef.tell(serializeResponse(response), getSelf());
+                                            this.calculateScore(response)
+                                                    .thenAccept(responseWithScore -> {
+                                                        if (responseWithScore != null) {
+                                                            actorRef.tell(serializeResponse(responseWithScore), getSelf());
+                                                        } else {
+                                                            actorRef.tell(serializeResponse(response), getSelf());
+                                                        }
+                                                    });
                                         });
                             });
                 })
