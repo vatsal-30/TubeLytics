@@ -132,4 +132,16 @@ public class YouTubeController extends Controller {
                             });
                 });
     }
+
+    /**
+     * This will return the JSON response of the keyword and description of searched videos from that keywords and their frequency.
+     *
+     * @author Karan Tanakhia
+     */
+    public CompletionStage<Result> getWordStats(String keyword) {
+
+
+        return youTubeService.wordStatesVideos(keyword)
+                .thenApply(wordStats-> ok(views.html.wordStats.render(keyword, wordStats)));
+    }
 }
