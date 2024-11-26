@@ -59,7 +59,6 @@ public class WebSocketActor extends AbstractActor {
 
                     actorSelection.resolveOne(Duration.ofSeconds(2)).toCompletableFuture()
                             .thenAccept(actorRef -> {
-                                System.out.println("ActorRef: " + actorRef);
                                 supervisorRef.tell(message, actorRef);
                             });
                 })

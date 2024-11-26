@@ -1,15 +1,13 @@
 package controllers;
 
-import actor.DescriptionReadabilityActor;
-import actor.SupervisorActor;
-import actor.TimeActor;
-import actor.WebSocketActor;
+import actor.*;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.stream.Materializer;
 import com.typesafe.config.Config;
 import model.SearchForm;
+import model.Video;
 import play.data.Form;
 import play.data.FormFactory;
 import play.libs.Json;
@@ -19,6 +17,8 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.WebSocket;
+import scala.jdk.javaapi.FutureConverters;
+
 import services.YouTubeService;
 import services.VideoService;
 
@@ -26,7 +26,7 @@ import javax.inject.Inject;
 
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
-
+import static akka.pattern.Patterns.ask;
 /**
  * @author Utsav Patel
  */
@@ -39,7 +39,7 @@ public class YouTubeController extends Controller {
     private final String API_KEY;
     private final Form<SearchForm> searchForm;
     private final ActorRef supervisorActor;
-
+    private final ActorRef videoServiceActor;
     @Inject
     public YouTubeController(YouTubeService youTubeService, FormFactory formFactory, VideoService videoService, ActorSystem actorSystem, Materializer materializer, WSClient wsClient, Config config) {
         this.youTubeService = youTubeService;
@@ -49,8 +49,10 @@ public class YouTubeController extends Controller {
         this.materializer = materializer;
         this.wsClient = wsClient;
         this.API_KEY = config.getString("youtube.api.key");
+//        VideoServiceActor = videoServiceActor;
         actorSystem.actorOf(TimeActor.getProps(), "timeActor");
         actorSystem.actorOf(DescriptionReadabilityActor.props(), "descriptionReadability");
+        this.videoServiceActor = actorSystem.actorOf(VideoServiceActor.props(this.wsClient,this.API_KEY), "videoActor");
         this.supervisorActor = actorSystem.actorOf(SupervisorActor.props(this.wsClient, API_KEY), "supervisor");
     }
 
@@ -96,8 +98,11 @@ public class YouTubeController extends Controller {
      * @author Yash Ajmeri
      */
     public CompletionStage<Result> showVideoDetails(String videoId) {
-        return videoService.getVideoById(videoId)
-                .thenApply(video -> ok(views.html.videoDetailsPage.render(video)));
+
+        return FutureConverters.asJava(ask(this.videoServiceActor,videoId,2000))
+                .thenApply(video -> ok(views.html.videoDetailsPage.render((Video) video)));
+//        return videoService.getVideoById(videoId)
+//                .thenApply(video -> ok(views.html.videoDetailsPage.render(video)));
     }
 
     /**
@@ -126,5 +131,17 @@ public class YouTubeController extends Controller {
                                 return ok(views.html.channelProfile.render(channelProfile)); // Pass to the view
                             });
                 });
+    }
+
+    /**
+     * This will return the JSON response of the keyword and description of searched videos from that keywords and their frequency.
+     *
+     * @author Karan Tanakhia
+     */
+    public CompletionStage<Result> getWordStats(String keyword) {
+
+
+        return youTubeService.wordStatesVideos(keyword)
+                .thenApply(wordStats-> ok(views.html.wordStats.render(keyword, wordStats)));
     }
 }
