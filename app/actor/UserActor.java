@@ -58,6 +58,7 @@ public class UserActor extends AbstractActor {
                     this.searchVideos(message)
                             .toCompletableFuture()
                             .thenAccept(response -> {
+                                response.setFromKeyword(true);
                                 this.calculateScore(response)
                                         .thenAccept(responseWithScore -> {
                                             if (responseWithScore != null) {
@@ -74,7 +75,15 @@ public class UserActor extends AbstractActor {
                                 searchVideos(keyword)
                                         .toCompletableFuture()
                                         .thenAccept(response -> {
-                                            actorRef.tell(serializeResponse(response), getSelf());
+                                            response.setFromKeyword(false);
+                                            this.calculateScore(response)
+                                                    .thenAccept(responseWithScore -> {
+                                                        if (responseWithScore != null) {
+                                                            actorRef.tell(serializeResponse(responseWithScore), getSelf());
+                                                        } else {
+                                                            actorRef.tell(serializeResponse(response), getSelf());
+                                                        }
+                                                    });
                                         });
                             });
                 })
