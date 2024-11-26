@@ -13,6 +13,7 @@ public class Response {
     private Double averageFleschReadingScore;
     private List<Video> videos;
     private String sentiment;
+    private boolean isFromKeyword;
 
     public Response() {
     }
@@ -55,5 +56,13 @@ public class Response {
 
     public void setSentiment(String sentiment) {
         this.sentiment = sentiment;
+    }
+
+    public boolean isFromKeyword() {
+        return isFromKeyword;
+    }
+
+    public void setFromKeyword(boolean fromKeyword) {
+        isFromKeyword = fromKeyword;
     }
 }

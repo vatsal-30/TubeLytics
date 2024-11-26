@@ -58,6 +58,7 @@ public class UserActor extends AbstractActor {
                     this.searchVideos(message)
                             .toCompletableFuture()
                             .thenAccept(response -> {
+                                response.setFromKeyword(true);
                                 this.calculateScore(response)
                                         .thenAccept(responseWithScore -> {
                                             if (responseWithScore != null) {
@@ -74,6 +75,7 @@ public class UserActor extends AbstractActor {
                                 searchVideos(keyword)
                                         .toCompletableFuture()
                                         .thenAccept(response -> {
+                                            response.setFromKeyword(false);
                                             this.calculateScore(response)
                                                     .thenAccept(responseWithScore -> {
                                                         if (responseWithScore != null) {
