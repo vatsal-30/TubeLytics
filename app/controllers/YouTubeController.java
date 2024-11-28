@@ -52,6 +52,7 @@ public class YouTubeController extends Controller {
 //        VideoServiceActor = videoServiceActor;
         actorSystem.actorOf(TimeActor.getProps(), "timeActor");
         actorSystem.actorOf(DescriptionReadabilityActor.props(), "descriptionReadability");
+        actorSystem.actorOf(SentimentAnalyzerActor.props(), "sentimentalAnalyzer");
         this.videoServiceActor = actorSystem.actorOf(VideoServiceActor.props(this.wsClient,this.API_KEY), "videoActor");
         this.supervisorActor = actorSystem.actorOf(SupervisorActor.props(this.wsClient, API_KEY), "supervisor");
     }
