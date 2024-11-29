@@ -23,22 +23,42 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+/**
+ * This class contains test cases for the {@code VideoServiceActor}.
+ * It uses Akka TestKit to simulate actor-based behavior and Mockito for mocking dependencies.
+ *
+ * The test cases cover both successful video details retrieval and error scenarios.
+ *
+ * @author Yash Ajmeri
+ */
+
 public class VideoServiceActorTest {
 
     private static ActorSystem system;
     private static final String API_KEY = "test_api_key";
     private static final String VIDEO_ID = "test_video_id";
+    /**
+     * Sets up the Actor System before any test cases are executed.
+     */
 
     @BeforeClass
     public static void setup() {
         system = ActorSystem.create();
     }
+    /**
+     * Tears down the Actor System after all test cases are executed.
+     */
 
     @AfterClass
     public static void teardown() {
         TestKit.shutdownActorSystem(system);
         system = null;
     }
+    /**
+     * Tests the successful retrieval of video details using the {@code VideoServiceActor}.
+     * It mocks an API response and verifies the content of the retrieved video details.
+     * @author Yash Ajmeri
+     */
 
     @Test
     public void testFetchVideoDetails() {
@@ -87,6 +107,11 @@ public class VideoServiceActorTest {
             assertEquals("tag1,tag2", response.getTags());
         }};
     }
+    /**
+     * Tests the error handling behavior of the {@code VideoServiceActor}.
+     * It simulates an API error and verifies that the error message is correctly propagated.
+     * @author Yash Ajmeri
+     */
 
     @Test
     public void testFetchVideoDetailsError() {

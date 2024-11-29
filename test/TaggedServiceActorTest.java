@@ -25,22 +25,43 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+/**
+ * Unit tests for the {@link TaggedServiceActor} class.
+ *
+ * @author Yash Ajmeri
+ */
+
 public class TaggedServiceActorTest {
 
     private static ActorSystem system;
     private static final String API_KEY = "test_api_key";
     private static final String TAG = "test_tag";
 
+    /**
+     * Initializes the actor system before running the tests.
+     */
+
     @BeforeClass
     public static void setup() {
         system = ActorSystem.create();
     }
+
+    /**
+     * Shuts down the actor system after all tests are complete.
+     */
 
     @AfterClass
     public static void teardown() {
         TestKit.shutdownActorSystem(system);
         system = null;
     }
+
+    /**
+     * Tests the {@link TaggedServiceActor} when a valid tag is provided.
+     * Verifies that the actor correctly parses the API response and sends a {@link Response} object.
+     * @author Yash Ajmeri
+     *
+     */
 
     @Test
     public void testOnSearchByTag() {
@@ -94,6 +115,12 @@ public class TaggedServiceActorTest {
             assertEquals("Channel Title 1", video.getChannelTitle());
         }};
     }
+
+    /**
+     * Tests the {@link TaggedServiceActor} when the API call fails.
+     * Verifies that the actor sends an appropriate error message back to the sender.
+     * @author Yash Ajmeri
+     */
 
     @Test
     public void testOnSearchByTagError() {
