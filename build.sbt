@@ -27,6 +27,7 @@ libraryDependencies ++= Seq(
   "junit" % "junit" % "4.13.1" % Test,
   "org.mockito" % "mockito-core" % "5.12.0" % Test,
   "com.typesafe.akka" %% "akka-testkit" % "2.6.20" % Test) // Akka TestKit
+
 //libraryDependencies += "org.mockito" %% "mockito-inline" % "4.0.0" % Test
 
 libraryDependencies := libraryDependencies.value.map(_.excludeAll(

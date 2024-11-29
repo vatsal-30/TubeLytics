@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 public class SupervisorActor extends AbstractActor {
     private final WSClient ws;
     private final String API_KEY;
-    private final Map<ActorRef, ActorRef> userActors = new ConcurrentHashMap<>();
+    public Map<ActorRef, ActorRef> userActors = new ConcurrentHashMap<>();
 
     public SupervisorActor(WSClient wsClient, String apiKey) {
         this.ws = wsClient;
