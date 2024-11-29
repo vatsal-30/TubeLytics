@@ -24,12 +24,12 @@ import java.util.stream.StreamSupport;
 import static akka.pattern.Patterns.ask;
 
 public class UserActor extends AbstractActor {
+    private static final String YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search";
+    private static final String YOUTUBE_VIDEO_URL = "https://www.googleapis.com/youtube/v3/videos";
     private final ActorRef actorRef;
     private final WSClient ws;
     private final String API_KEY;
     private final List<String> searchHistory = new ArrayList<>();
-    private static final String YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search";
-    private static final String YOUTUBE_VIDEO_URL = "https://www.googleapis.com/youtube/v3/videos";
 
     public UserActor(ActorRef actorRef, WSClient wsClient, String apiKey) {
         this.actorRef = actorRef;
@@ -59,13 +59,22 @@ public class UserActor extends AbstractActor {
                             .toCompletableFuture()
                             .thenAccept(response -> {
                                 response.setFromKeyword(true);
-                                this.calculateScore(response)
-                                        .thenAccept(responseWithScore -> {
-                                            if (responseWithScore != null) {
-                                                actorRef.tell(serializeResponse(responseWithScore), getSelf());
+
+                                this.analyzeSentiments(response)
+                                        .thenAccept(responseWithSentiment -> {
+                                            if (responseWithSentiment != null) {
+                                                this.calculateScore(responseWithSentiment)
+                                                        .thenAccept(responseWithScore -> {
+                                                            if (responseWithScore != null) {
+                                                                actorRef.tell(serializeResponse(responseWithScore), getSelf());
+                                                            } else {
+                                                                actorRef.tell(serializeResponse(responseWithSentiment), getSelf());
+                                                            }
+                                                        });
                                             } else {
                                                 actorRef.tell(serializeResponse(response), getSelf());
                                             }
+
                                         });
                             });
                 })
@@ -76,13 +85,21 @@ public class UserActor extends AbstractActor {
                                         .toCompletableFuture()
                                         .thenAccept(response -> {
                                             response.setFromKeyword(false);
-                                            this.calculateScore(response)
-                                                    .thenAccept(responseWithScore -> {
-                                                        if (responseWithScore != null) {
-                                                            actorRef.tell(serializeResponse(responseWithScore), getSelf());
+                                            this.analyzeSentiments(response)
+                                                    .thenAccept(responseWithSentiment -> {
+                                                        if (responseWithSentiment != null) {
+                                                            this.calculateScore(responseWithSentiment)
+                                                                    .thenAccept(responseWithScore -> {
+                                                                        if (responseWithScore != null) {
+                                                                            actorRef.tell(serializeResponse(responseWithScore), getSelf());
+                                                                        } else {
+                                                                            actorRef.tell(serializeResponse(responseWithSentiment), getSelf());
+                                                                        }
+                                                                    });
                                                         } else {
                                                             actorRef.tell(serializeResponse(response), getSelf());
                                                         }
+
                                                     });
                                         });
                             });
@@ -122,7 +139,13 @@ public class UserActor extends AbstractActor {
                 }).exceptionally(e -> {
                     System.out.println("ERROR : Unable to Fetch Videos.");
                     return null;
+                })
+                .exceptionally(e -> {
+                    System.err.println("ERROR: Unable to fetch videos for keyword: " + keyword + " - " + e.getMessage());
+                    getSender().tell("ERROR: Unable to fetch videos", getSelf());
+                    return null;
                 });
+
 
         responseStage = responseStage
                 .thenCompose(response -> {
@@ -157,16 +180,36 @@ public class UserActor extends AbstractActor {
         ActorSelection actorSelection = context().actorSelection(actorPath);
 
         return actorSelection.resolveOne(Duration.ofSeconds(2)).toCompletableFuture()
-                .thenCompose(actorRef -> FutureConverters.asJava(ask(actorRef, response, 2000))
-                        .thenApply(calculatedDescriptionScoreResponse -> {
-                            if (calculatedDescriptionScoreResponse instanceof Response) {
-                                return (Response) calculatedDescriptionScoreResponse;
+                .exceptionally(e -> {
+                    System.err.println("ERROR: Failed to resolve descriptionReadability actor: " + e.getMessage());
+                    return null;
+                })
+                .thenCompose(actorRef -> actorRef != null
+                        ? FutureConverters.asJava(ask(actorRef, response, 2000)).thenApply(calculatedResponse -> {
+                            if (calculatedResponse instanceof Response) {
+                                return (Response) calculatedResponse;
                             }
                             return null;
-                        }));
+                        })
+                : CompletableFuture.completedFuture(null));
+
     }
 
-    public String serializeResponse(Response response) {
+    public CompletionStage<Response> analyzeSentiments(Response response) {
+        String actorPath = "akka://application/user/sentimentalAnalyzer";
+        ActorSelection actorSelection = context().actorSelection(actorPath);
+
+        return actorSelection.resolveOne(Duration.ofSeconds(2)).toCompletableFuture()
+                .thenCompose(actorRef -> FutureConverters.asJava(ask(actorRef, response, 2000))
+                    .thenApply(analyzedResponse -> {
+                        if (analyzedResponse instanceof Response) {
+                            return (Response) analyzedResponse;
+                        }
+                        return null;
+                    }));
+    }
+
+    public static String serializeResponse(Response response) {
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(response);
@@ -174,5 +217,6 @@ public class UserActor extends AbstractActor {
             throw new RuntimeException("Failed to serialize response", e);
         }
     }
+
 
 }
