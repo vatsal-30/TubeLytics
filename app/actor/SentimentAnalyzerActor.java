@@ -90,6 +90,8 @@ public class SentimentAnalyzerActor extends AbstractActor {
             "pessimistic", "pessimism", "pessimistically", "pessimist"
     ));
 
+    private static final Set<String> wordsToRemove = new HashSet<>(Arrays.asList("about", "above", "across", "after", "against", "along", "among", "around", "at", "before", "behind", "below", "beneath", "beside", "between", "beyond", "by", "down", "during", "for", "from", "in", "inside", "into", "like", "near", "of", "off", "on", "onto", "outside", "over", "past", "since", "through", "throughout", "to", "toward", "under", "underneath", "until", "up", "upon", "with", "within", "without", "although", "and", "as", "because", "before", "but", "even if", "even though", "if", "nor", "not only", "but also", "once", "or", "since", "so", "than", "that", "then", "though", "unless", "until", "when", "whenever", "where", "wherever", "whether", "while", "yet", "all", "anybody", "anyone", "anything", "each", "each other", "either", "everybody", "everyone", "everything", "few", "he", "her", "hers", "herself", "him", "himself", "his", "i", "it", "its", "itself", "many", "me", "mine", "myself", "neither", "nobody", "none", "no one", "nothing", "one", "one another", "ours", "ourselves", "she", "some", "somebody", "someone", "something", "that", "their", "theirs", "them", "themselves", "these", "they", "this", "those", "us", "we", "what", "whatever", "when", "where", "which", "who", "whom", "whose", "you", "yours", "yourself", "yourselves", "ah", "aha", "alas", "bravo", "ew", "hey", "hmm", "hurray", "oh", "oops", "ouch", "phew", "ugh", "wow", "yay", "yikes"));
+
 
     private static final Pattern NON_ALPHABET_PATTERN = Pattern.compile("[^a-zA-Z]");
 
@@ -99,12 +101,7 @@ public class SentimentAnalyzerActor extends AbstractActor {
     }
 
 
-    public String analyzeSentimentForDescription(String description) {
-
-        if (description.isEmpty()) {
-            return ":-|";
-        }
-
+    public static String analyzeSentimentForDescription(String description) {
         String[] words = NON_ALPHABET_PATTERN.matcher(description.toLowerCase()).replaceAll(" ").split("\\s+");
 
         long happyCount = Arrays.stream(words)
@@ -115,7 +112,11 @@ public class SentimentAnalyzerActor extends AbstractActor {
                 .filter(sadWords::contains)
                 .count();
 
-        long totalWords = words.length;
+        long removedWords = Arrays.stream(words)
+                .filter(wordsToRemove::contains)
+                .count();
+
+        long totalWords = words.length - removedWords;
 
         double happyPercentage = (double) happyCount / totalWords;
         double sadPercentage = (double) sadCount / totalWords;
@@ -134,19 +135,24 @@ public class SentimentAnalyzerActor extends AbstractActor {
      *
      * @author Vatsal Mukeshkumar Ajmeri
      */
-    public String analyzeSentiment(List<String> descriptions) {
+    public static String analyzeSentiment(List<String> descriptions) {
+
+        if (descriptions.isEmpty()) {
+            return ":-|";
+        }
+
         long happyCount = descriptions.stream()
-                .map(this::analyzeSentimentForDescription)
+                .map(SentimentAnalyzerActor::analyzeSentimentForDescription)
                 .filter(s -> s.equals(":-)"))
                 .count();
 
         long sadCount = descriptions.stream()
-                .map(this::analyzeSentimentForDescription)
+                .map(SentimentAnalyzerActor::analyzeSentimentForDescription)
                 .filter(s -> s.equals(":-("))
                 .count();
 
         long neutralCount = descriptions.stream()
-                .map(this::analyzeSentimentForDescription)
+                .map(SentimentAnalyzerActor::analyzeSentimentForDescription)
                 .filter(s -> s.equals(":-|"))
                 .count();
 
