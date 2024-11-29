@@ -9,6 +9,8 @@ import org.junit.*;
 
 import java.util.ArrayList;
 
+import static org.junit.Assert.assertEquals;
+
 public class DescriptionReadabilityActorTest {
 
     private static ActorSystem actorSystem;
@@ -70,5 +72,88 @@ public class DescriptionReadabilityActorTest {
 
         Assert.assertTrue(50 < video.getFleschReadingScore());
         Assert.assertTrue(60 > video.getFleschReadingScore());
+    }
+
+    /**
+     * This method tests countSentences method.
+     *
+     * @author Utsav Patel
+     */
+    @Test
+    public void countSentenceTest() {
+        int countSentences = DescriptionReadabilityActor.countSentences(TEXT);
+        Assert.assertEquals(4, countSentences);
+    }
+
+    /**
+     * This method tests splitIntoWords method.
+     *
+     * @author Utsav Patel
+     */
+    @Test
+    public void splitIntoWordsTest() {
+        String[] words = DescriptionReadabilityActor.splitIntoWords(TEXT);
+        Assert.assertNotNull(words);
+        Assert.assertEquals(88, words.length);
+        Assert.assertEquals("In", words[0]);
+        Assert.assertEquals("a", words[1]);
+    }
+
+    /**
+     * This method tests isConsonant method.
+     *
+     * @author Utsav Patel
+     */
+    @Test
+    public void consonantTest() {
+        Assert.assertFalse(DescriptionReadabilityActor.isConsonant('a'));
+        Assert.assertTrue(DescriptionReadabilityActor.isConsonant('b'));
+    }
+
+    /**
+     * This method tests countSyllables method.
+     *
+     * @author Utsav Patel
+     */
+    @Test
+    public void countSyllablesTest() {
+        assertEquals(1, DescriptionReadabilityActor.countSyllables("a"));
+        assertEquals(1, DescriptionReadabilityActor.countSyllables("cake"));
+        assertEquals(3, DescriptionReadabilityActor.countSyllables("elephant"));
+        assertEquals(1, DescriptionReadabilityActor.countSyllables("table"));
+        assertEquals(3, DescriptionReadabilityActor.countSyllables("tablee"));
+        assertEquals(2, DescriptionReadabilityActor.countSyllables("taalee"));
+        assertEquals(1, DescriptionReadabilityActor.countSyllables("whale"));
+        assertEquals(2, DescriptionReadabilityActor.countSyllables("waleed"));
+        assertEquals(1, DescriptionReadabilityActor.countSyllables("played"));
+        assertEquals(1, DescriptionReadabilityActor.countSyllables("watches"));
+        assertEquals(2, DescriptionReadabilityActor.countSyllables("agrees"));
+        assertEquals(1, DescriptionReadabilityActor.countSyllables("rhythm"));
+        assertEquals(2, DescriptionReadabilityActor.countSyllables("HeLLo "));
+        assertEquals(3, DescriptionReadabilityActor.countSyllables("beautiful"));
+        assertEquals(1, DescriptionReadabilityActor.countSyllables("red"));
+        assertEquals(1, DescriptionReadabilityActor.countSyllables("yes"));
+        assertEquals(1, DescriptionReadabilityActor.countSyllables("aeiou"));
+    }
+
+    /**
+     * This method tests calculateReadabilityScores method.
+     *
+     * @author Utsav Patel
+     */
+    @Test
+    public void calculateReadabilityScoresTest() {
+        double[] calculateReadabilityScores = DescriptionReadabilityActor.calculateReadabilityScores(TEXT);
+        // Between 10 and 12
+        Assert.assertTrue(10 < calculateReadabilityScores[0]);
+        Assert.assertTrue(12 > calculateReadabilityScores[0]);
+
+        // Between 50 and 60
+        Assert.assertTrue(50 < calculateReadabilityScores[1]);
+        Assert.assertTrue(60 > calculateReadabilityScores[1]);
+
+        calculateReadabilityScores = DescriptionReadabilityActor.calculateReadabilityScores("");
+        Assert.assertEquals(Double.valueOf(0.0), Double.valueOf(calculateReadabilityScores[0]));
+        Assert.assertEquals(Double.valueOf(0.0), Double.valueOf(calculateReadabilityScores[1]));
     }
 }
