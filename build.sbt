@@ -25,6 +25,7 @@ libraryDependencies ++= Seq(
   javaWs,
 //  "ch.qos.logback" % "logback-classic" % "1.2.3",
   "junit" % "junit" % "4.13.1" % Test,
+  "org.awaitility" % "awaitility" % "3.0.0" % Test,
   "org.mockito" % "mockito-core" % "5.12.0" % Test)
 //libraryDependencies += "org.mockito" %% "mockito-inline" % "4.0.0" % Test
 
