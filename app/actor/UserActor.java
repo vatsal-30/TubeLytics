@@ -136,9 +136,6 @@ public class UserActor extends AbstractActor {
                     response.setQuery(keyword);
                     response.setVideos(videoStream.toList());
                     return response;
-                }).exceptionally(e -> {
-                    System.out.println("ERROR : Unable to Fetch Videos.");
-                    return null;
                 })
                 .exceptionally(e -> {
                     System.err.println("ERROR: Unable to fetch videos for keyword: " + keyword + " - " + e.getMessage());
@@ -186,13 +183,12 @@ public class UserActor extends AbstractActor {
                 })
                 .thenCompose(actorRef -> actorRef != null
                         ? FutureConverters.asJava(ask(actorRef, response, 2000)).thenApply(calculatedResponse -> {
-                            if (calculatedResponse instanceof Response) {
-                                return (Response) calculatedResponse;
-                            }
-                            return null;
-                        })
-                : CompletableFuture.completedFuture(null));
-
+                    if (calculatedResponse instanceof Response) {
+                        return (Response) calculatedResponse;
+                    }
+                    return null;
+                })
+                        : CompletableFuture.completedFuture(null));
     }
 
     public CompletionStage<Response> analyzeSentiments(Response response) {
@@ -200,13 +196,18 @@ public class UserActor extends AbstractActor {
         ActorSelection actorSelection = context().actorSelection(actorPath);
 
         return actorSelection.resolveOne(Duration.ofSeconds(2)).toCompletableFuture()
-                .thenCompose(actorRef -> FutureConverters.asJava(ask(actorRef, response, 2000))
-                    .thenApply(analyzedResponse -> {
-                        if (analyzedResponse instanceof Response) {
-                            return (Response) analyzedResponse;
-                        }
-                        return null;
-                    }));
+                .exceptionally(e -> {
+                    System.err.println("ERROR: Failed to resolve sentimentalAnalyzer actor: " + e.getMessage());
+                    return null;
+                })
+                .thenCompose(actorRef -> actorRef != null
+                        ? FutureConverters.asJava(ask(actorRef, response, 2000))
+                        .thenApply(analyzedResponse -> {
+                            if (analyzedResponse instanceof Response) {
+                                return (Response) analyzedResponse;
+                            }
+                            return null;
+                        }) : CompletableFuture.completedFuture(null));
     }
 
     public static String serializeResponse(Response response) {
