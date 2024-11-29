@@ -21,6 +21,7 @@ import java.util.concurrent.CompletionStage;
  *
  * @author Amish Navadia
  */
+
 public class ChannelProfileActor extends AbstractActor {
 
     private final WSClient wsClient;
@@ -34,8 +35,11 @@ public class ChannelProfileActor extends AbstractActor {
      * @param wsClient the WSClient used for making HTTP requests.
      * @param apiKey   the YouTube API key.
      * @return Props instance for creating the actor.
+     * @see Props
+     * @see WSClient
      * @author Amish Navadia
      */
+
     public static Props props(WSClient wsClient, String apiKey) {
         return Props.create(ChannelProfileActor.class, () -> new ChannelProfileActor(wsClient, apiKey));
     }
@@ -45,20 +49,29 @@ public class ChannelProfileActor extends AbstractActor {
      *
      * @param wsClient the WSClient used for making HTTP requests.
      * @param apiKey   the YouTube API key.
+     * @see WSClient
+     * @see AbstractActor
+     * @see ChannelProfileActor#props(WSClient, String)
      * @author Amish Navadia
      */
+
     public ChannelProfileActor(WSClient wsClient, String apiKey) {
         this.wsClient = wsClient;
         this.apiKey = apiKey;
     }
 
     /**
-     * Defines the message handling behavior for this actor.
+     * Defines the message-handling behavior for this actor.
      *
      * @return Receive object defining the actor's behavior.
      * @see AbstractActor#createReceive()
+     * @see Channel
+     * @see ChannelProfile
+     * @see Video
+     * @see WSClient
      * @author Amish Navadia
      */
+
     @Override
     public Receive createReceive() {
         return ReceiveBuilder.create()
@@ -67,15 +80,21 @@ public class ChannelProfileActor extends AbstractActor {
     }
 
     /**
-     * Handles the FetchChannelProfile message.
-     * Fetches the profile and videos for the given channel ID and sends the result back to the sender.
+     * Handles a message to fetch the channel profile and its recent videos.
      *
-     * @param channel the Channel message containing the channel ID.
+     * This method fetches channel details and the recent videos for the given channel ID and sends
+     * the resulting {@link ChannelProfile} object back to the sender.
+     *
+     * @param channel the message containing the channel ID.
      * @see Channel
      * @see ChannelProfile
      * @see Video
+     * @see WSClient
+     * @see CompletableFuture
+     * @see CompletionStage
      * @author Amish Navadia
      */
+
     private void handleFetchChannelProfile(Channel channel) {
         ActorRef originalSender = getSender();
 
@@ -106,8 +125,12 @@ public class ChannelProfileActor extends AbstractActor {
      * @return a CompletionStage containing the ChannelProfile of the channel.
      * @see ChannelProfile
      * @see CompletableFuture
+     * @see CompletionStage
+     * @see WSClient
+     * @see ArrayList
      * @author Amish Navadia
      */
+
     private CompletionStage<ChannelProfile> fetchChannelProfile(String channelId) {
         return wsClient.url(YOUTUBE_CHANNEL_URL)
                 .addQueryParameter("part", "snippet,statistics")
@@ -128,16 +151,22 @@ public class ChannelProfileActor extends AbstractActor {
                 });
     }
 
+
     /**
-     * Fetches the latest videos of a YouTube channel.
+     * Fetches the recent videos of a YouTube channel.
      *
      * @param channelId the ID of the channel to fetch videos for.
      * @param count     the maximum number of videos to fetch.
      * @return a CompletionStage containing a list of Video objects representing the channel's videos.
      * @see Video
      * @see CompletableFuture
+     * @see ArrayList
+     * @see WSClient
+     * @see CompletionStage
+     * @see ChannelProfileActor#fetchChannelProfile(String)
      * @author Amish Navadia
      */
+
     private CompletionStage<List<Video>> fetchChannelVideos(String channelId, int count) {
         return wsClient.url(YOUTUBE_SEARCH_URL)
                 .addQueryParameter("part", "snippet")
@@ -169,6 +198,7 @@ public class ChannelProfileActor extends AbstractActor {
     /**
      * Message class representing a request to fetch a channel profile.
      */
+
     public static class Channel {
         public final String channelId;
 
@@ -176,8 +206,15 @@ public class ChannelProfileActor extends AbstractActor {
          * Constructor for the Channel message.
          *
          * @param channelId the ID of the channel to fetch the profile for.
+         * @see ChannelProfileActor
+         * @see ChannelProfile
+         * @see Video
+         * @see WSClient
+         * @see ArrayList
+         * @see CompletableFuture
          * @author Amish Navadia
          */
+
         public Channel(String channelId) {
             this.channelId = channelId;
         }
