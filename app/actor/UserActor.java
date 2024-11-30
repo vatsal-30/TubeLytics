@@ -96,19 +96,14 @@ public class UserActor extends AbstractActor {
 
                                 this.analyzeSentiments(response)
                                         .thenAccept(responseWithSentiment -> {
-                                            if (responseWithSentiment != null) {
-                                                this.calculateScore(responseWithSentiment)
-                                                        .thenAccept(responseWithScore -> {
-                                                            if (responseWithScore != null) {
-                                                                actorRef.tell(serializeResponse(responseWithScore), getSelf());
-                                                            } else {
-                                                                actorRef.tell(serializeResponse(responseWithSentiment), getSelf());
-                                                            }
-                                                        });
-                                            } else {
-                                                actorRef.tell(serializeResponse(response), getSelf());
-                                            }
-
+                                            this.calculateScore(responseWithSentiment == null ? response : responseWithSentiment)
+                                                    .thenAccept(responseWithScore -> {
+                                                        if (responseWithScore != null) {
+                                                            actorRef.tell(serializeResponse(responseWithScore), getSelf());
+                                                        } else {
+                                                            actorRef.tell(serializeResponse(responseWithSentiment == null ? response : responseWithSentiment), getSelf());
+                                                        }
+                                                    });
                                         });
                             });
                 })
@@ -121,19 +116,14 @@ public class UserActor extends AbstractActor {
                                             response.setFromKeyword(false);
                                             this.analyzeSentiments(response)
                                                     .thenAccept(responseWithSentiment -> {
-                                                        if (responseWithSentiment != null) {
-                                                            this.calculateScore(responseWithSentiment)
-                                                                    .thenAccept(responseWithScore -> {
-                                                                        if (responseWithScore != null) {
-                                                                            actorRef.tell(serializeResponse(responseWithScore), getSelf());
-                                                                        } else {
-                                                                            actorRef.tell(serializeResponse(responseWithSentiment), getSelf());
-                                                                        }
-                                                                    });
-                                                        } else {
-                                                            actorRef.tell(serializeResponse(response), getSelf());
-                                                        }
-
+                                                        this.calculateScore(responseWithSentiment == null ? response : responseWithSentiment)
+                                                                .thenAccept(responseWithScore -> {
+                                                                    if (responseWithScore != null) {
+                                                                        actorRef.tell(serializeResponse(responseWithScore), getSelf());
+                                                                    } else {
+                                                                        actorRef.tell(serializeResponse(responseWithSentiment == null ? response : responseWithSentiment), getSelf());
+                                                                    }
+                                                                });
                                                     });
                                         });
                             });
