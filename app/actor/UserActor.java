@@ -23,6 +23,18 @@ import java.util.stream.StreamSupport;
 
 import static akka.pattern.Patterns.ask;
 
+/**
+ * UserActor handles requests for YouTube video searches, sentiment analysis, and score calculations.
+ * <br/>
+ * Functionality:
+ * - Manages user search history
+ * - Performs YouTube video searches
+ * - Analyzes video sentiments
+ * - Calculates readability scores
+ * - Serializes responses to JSON
+ *
+ * @author Utsav Patel
+ */
 public class UserActor extends AbstractActor {
     private static final String YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search";
     private static final String YOUTUBE_VIDEO_URL = "https://www.googleapis.com/youtube/v3/videos";
@@ -31,16 +43,39 @@ public class UserActor extends AbstractActor {
     private final String API_KEY;
     private final List<String> searchHistory = new ArrayList<>();
 
+    /**
+     * Constructor for UserActor.
+     *
+     * @param actorRef Reference to the WebSocket actor for communication with the client
+     * @param wsClient Play WSClient instance for making HTTP requests
+     * @param apiKey   YouTube API key for authenticating requests
+     * @author Utsav Patel
+     */
     public UserActor(ActorRef actorRef, WSClient wsClient, String apiKey) {
         this.actorRef = actorRef;
         this.ws = wsClient;
         this.API_KEY = apiKey;
     }
 
+    /**
+     * Factory method for creating Props for UserActor.
+     *
+     * @param actorRef Reference to the WebSocket actor
+     * @param wsClient Play WSClient instance
+     * @param apiKey   YouTube API key
+     * @return Props instance for UserActor
+     * @author Utsav Patel
+     */
     public static Props props(ActorRef actorRef, WSClient wsClient, String apiKey) {
         return Props.create(UserActor.class, () -> new UserActor(actorRef, wsClient, apiKey));
     }
 
+    /**
+     * Defines the behavior of the UserActor.
+     *
+     * @return Receive instance defining message handling logic
+     * @author Utsav Patel
+     */
     @Override
     public Receive createReceive() {
         return receiveBuilder()
@@ -54,7 +89,6 @@ public class UserActor extends AbstractActor {
                         searchHistory.remove(message);
                         searchHistory.add(message);
                     }
-                    // TODO: Then Sentiment
                     this.searchVideos(message)
                             .toCompletableFuture()
                             .thenAccept(response -> {
@@ -107,6 +141,13 @@ public class UserActor extends AbstractActor {
                 .build();
     }
 
+    /**
+     * Searches YouTube videos based on the given keyword.
+     *
+     * @param keyword Search keyword
+     * @return CompletionStage containing the search response
+     * @author Utsav Patel
+     */
     public CompletionStage<Response> searchVideos(String keyword) {
         WSRequest request = ws.url(YOUTUBE_SEARCH_URL)
                 .addQueryParameter("part", "snippet")
@@ -158,6 +199,13 @@ public class UserActor extends AbstractActor {
         return responseStage;
     }
 
+    /**
+     * Fetches the full description of a YouTube video by its ID.
+     *
+     * @param id Video ID
+     * @return CompletionStage containing the full description
+     * @author Utsav Patel
+     */
     public CompletionStage<String> fetchDescription(String id) {
         return this.ws.url(YOUTUBE_VIDEO_URL)
                 .addQueryParameter("part", "snippet")
@@ -172,6 +220,13 @@ public class UserActor extends AbstractActor {
                 });
     }
 
+    /**
+     * Calculates readability score for the given response.
+     *
+     * @param response Sentiment-analyzed response
+     * @return CompletionStage containing the response with calculated score
+     * @author Utsav Patel
+     */
     public CompletionStage<Response> calculateScore(Response response) {
         String actorPath = "akka://application/user/descriptionReadability";
         ActorSelection actorSelection = context().actorSelection(actorPath);
@@ -191,6 +246,13 @@ public class UserActor extends AbstractActor {
                         : CompletableFuture.completedFuture(null));
     }
 
+    /**
+     * Analyzes sentiments for the given response.
+     *
+     * @param response Search response
+     * @return CompletionStage containing the sentiment-analyzed response
+     * @author Utsav Patel
+     */
     public CompletionStage<Response> analyzeSentiments(Response response) {
         String actorPath = "akka://application/user/sentimentalAnalyzer";
         ActorSelection actorSelection = context().actorSelection(actorPath);
@@ -210,6 +272,13 @@ public class UserActor extends AbstractActor {
                         }) : CompletableFuture.completedFuture(null));
     }
 
+    /**
+     * Serializes a Response object to a JSON string.
+     *
+     * @param response Response object
+     * @return Serialized JSON string
+     * @author Utsav Patel
+     */
     public static String serializeResponse(Response response) {
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -218,6 +287,4 @@ public class UserActor extends AbstractActor {
             throw new RuntimeException("Failed to serialize response", e);
         }
     }
-
-
 }

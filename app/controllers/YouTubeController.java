@@ -1,65 +1,66 @@
-    package controllers;
+package controllers;
 
-    import actor.*;
-    import akka.actor.ActorRef;
-    import akka.actor.ActorSystem;
-    import akka.actor.Props;
-    import akka.stream.Materializer;
-    import com.typesafe.config.Config;
-    import model.Response;
-    import model.SearchForm;
-    import model.Video;
-    import play.data.Form;
-    import play.data.FormFactory;
-    import play.libs.Json;
-    import play.libs.streams.ActorFlow;
-    import play.libs.ws.WSClient;
-    import play.mvc.Controller;
-    import play.mvc.Http;
-    import play.mvc.Result;
-    import play.mvc.WebSocket;
-    import scala.jdk.javaapi.FutureConverters;
+import actor.*;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.Props;
+import akka.stream.Materializer;
+import com.typesafe.config.Config;
+import model.SearchForm;
+import model.Video;
+import play.data.Form;
+import play.data.FormFactory;
+import play.libs.Json;
+import play.libs.streams.ActorFlow;
+import play.libs.ws.WSClient;
+import play.mvc.Controller;
+import play.mvc.Http;
+import play.mvc.Result;
+import play.mvc.WebSocket;
+import scala.jdk.javaapi.FutureConverters;
 
-    import services.YouTubeService;
-    import services.VideoService;
+import services.YouTubeService;
+import services.VideoService;
 
-    import javax.inject.Inject;
+import javax.inject.Inject;
 
-    import java.util.UUID;
-    import java.util.concurrent.CompletionStage;
-    import static akka.pattern.Patterns.ask;
-    /**
-     * @author Utsav Patel
-     */
-    public class YouTubeController extends Controller {
-        private final YouTubeService youTubeService;
-        private final VideoService videoService;
-        private final ActorSystem actorSystem;
-        private final Materializer materializer;
-        private final WSClient wsClient;
-        private final String API_KEY;
-        private final Form<SearchForm> searchForm;
-        private final ActorRef supervisorActor;
-        private final ActorRef videoServiceActor;
-        private final ActorRef taggedServiceActor;
-        @Inject
-        public YouTubeController(YouTubeService youTubeService, FormFactory formFactory, VideoService videoService, ActorSystem actorSystem, Materializer materializer, WSClient wsClient, Config config) {
-            this.youTubeService = youTubeService;
-            this.videoService = videoService;
-            this.searchForm = formFactory.form(SearchForm.class);
-            this.actorSystem = actorSystem;
-            this.materializer = materializer;
-            this.wsClient = wsClient;
-            this.API_KEY = config.getString("youtube.api.key");
-            this.taggedServiceActor =  actorSystem.actorOf(TaggedServiceActor.props(this.wsClient,this.API_KEY), "tagActor");
-    //        VideoServiceActor = videoServiceActor;
-            actorSystem.actorOf(TimeActor.getProps(), "timeActor");
-            actorSystem.actorOf(DescriptionReadabilityActor.props(), "descriptionReadability");
-            actorSystem.actorOf(SentimentAnalyzerActor.props(), "sentimentalAnalyzer");
-            this.videoServiceActor = actorSystem.actorOf(VideoServiceActor.props(this.wsClient,this.API_KEY), "videoActor");
-            this.supervisorActor = actorSystem.actorOf(SupervisorActor.props(this.wsClient, API_KEY), "supervisor");
-        }
+import java.util.UUID;
+import java.util.concurrent.CompletionStage;
 
+import static akka.pattern.Patterns.ask;
+
+/**
+ * @author Utsav Patel
+ */
+public class YouTubeController extends Controller {
+    private final YouTubeService youTubeService;
+    private final VideoService videoService;
+    private final ActorSystem actorSystem;
+    private final Materializer materializer;
+    private final WSClient wsClient;
+    private final String API_KEY;
+    private final Form<SearchForm> searchForm;
+    private final ActorRef supervisorActor;
+    private final ActorRef videoServiceActor;
+
+    @Inject
+    public YouTubeController(YouTubeService youTubeService, FormFactory formFactory, VideoService videoService, ActorSystem actorSystem, Materializer materializer, WSClient wsClient, Config config) {
+        this.youTubeService = youTubeService;
+        this.videoService = videoService;
+        this.searchForm = formFactory.form(SearchForm.class);
+        this.actorSystem = actorSystem;
+        this.materializer = materializer;
+        this.wsClient = wsClient;
+        this.API_KEY = config.getString("youtube.api.key");
+//        VideoServiceActor = videoServiceActor;
+        actorSystem.actorOf(TimeActor.getProps(), "timeActor");
+        actorSystem.actorOf(DescriptionReadabilityActor.props(), "descriptionReadability");
+        actorSystem.actorOf(SentimentAnalyzerActor.props(), "sentimentalAnalyzer");
+        this.videoServiceActor = actorSystem.actorOf(VideoServiceActor.props(this.wsClient, this.API_KEY), "videoActor");
+        this.supervisorActor = actorSystem.actorOf(SupervisorActor.props(this.wsClient, API_KEY), "supervisor");
+    }
+  
+  
         /**
          * This method will render the index page, which contains a search field.
          *
@@ -82,6 +83,20 @@
                     .thenApply(response -> ok(Json.toJson(response)));
         }
 
+        /**
+        * Creates a WebSocket endpoint that establishes a connection between a client and the server using an Akka actor.
+        *
+        * <p>This method sets up a WebSocket that:
+        * <ul>
+        *   <li>Generates a unique identifier (UUID) for the WebSocket connection.</li>
+        *   <li>Creates a WebSocket actor using the `WebSocketActor` class with the generated UUID.</li>
+        *   <li>Registers the WebSocket actor with a supervisor actor for connection management.</li>
+        *   <li>Uses Akka Streams' `ActorFlow` to manage the interaction between the WebSocket and the actor system.</li>
+        * </ul>
+        *
+        * @return a WebSocket that processes textual messages
+        * @author Utsav Patel
+        */
         public WebSocket ws() {
             return WebSocket.Text.accept(request -> ActorFlow.actorRef(
                     actorRef -> {
@@ -146,8 +161,6 @@
          * @author Karan Tanakhia
          */
         public CompletionStage<Result> getWordStats(String keyword) {
-
-
             return youTubeService.wordStatesVideos(keyword)
                     .thenApply(wordStats-> ok(views.html.wordStats.render(keyword, wordStats)));
         }

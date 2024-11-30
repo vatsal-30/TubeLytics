@@ -24,6 +24,15 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for the {@link UserActor} class.
+ *
+ * <p>This test class verifies the behavior of the UserActor in handling video search queries,
+ * processing API responses, and serializing data. It uses Akka TestKit for actor-based testing,
+ * Mockito for mocking dependencies, and Jackson for JSON processing.
+ *
+ * @author Utsav Patel
+ */
 public class UserActorTest {
 
     private static ActorSystem actorSystem;
@@ -31,6 +40,14 @@ public class UserActorTest {
     private static final String SEARCH_KEYWORD = "test_keyword";
     private String jsonResponse;
 
+    /**
+     * Sets up JSON response data for tests.
+     *
+     * <p>This JSON simulates a valid response from the YouTube API, containing video details
+     * such as video ID, title, description, and thumbnail URL.
+     *
+     * @author Utsav Patel
+     */
     @Before
     public void setUp() {
         jsonResponse = """
@@ -73,17 +90,40 @@ public class UserActorTest {
                 """;
     }
 
+    /**
+     * Sets up the actor system before all tests.
+     *
+     * <p>This is required for running Akka-based tests.
+     *
+     * @author Utsav Patel
+     */
     @BeforeClass
     public static void setup() {
         actorSystem = ActorSystem.create();
     }
 
+    /**
+     * Tears down the actor system after all tests.
+     *
+     * <p>Shuts down the actor system to release resources and ensure proper cleanup.
+     *
+     * @author Utsav Patel
+     */
     @AfterClass
     public static void teardown() {
         TestKit.shutdownActorSystem(actorSystem);
         actorSystem = null;
     }
 
+    /**
+     * Tests the handling of a valid search query by the {@link UserActor}.
+     *
+     * <p>Simulates an API response containing two videos and verifies that the actor
+     * processes the response correctly, returning the expected data.
+     *
+     * @throws JsonProcessingException if an error occurs during JSON parsing.
+     * @author Utsav Patel
+     */
     @Test
     public void testOnSearchVideos() throws JsonProcessingException {
         WSClient wsClient = mock(WSClient.class);
@@ -116,6 +156,14 @@ public class UserActorTest {
         assertEquals("https://example.com/image1.jpg", video1.getImageUrl());
     }
 
+    /**
+     * Tests the handling of an empty API response by the {@link UserActor}.
+     *
+     * <p>Verifies that the actor correctly processes an empty response, returning no videos.
+     *
+     * @throws JsonProcessingException if an error occurs during JSON parsing.
+     * @author Utsav Patel
+     */
     @Test
     public void testOnEmptyApiResponse() throws JsonProcessingException {
         WSClient wsClient = mock(WSClient.class);
@@ -142,6 +190,14 @@ public class UserActorTest {
         assertEquals(0, response.getVideos().size());
     }
 
+    /**
+     * Tests the serialization failure handling in the {@link UserActor}.
+     *
+     * <p>Simulates a scenario where Jackson's ObjectMapper throws a JsonProcessingException
+     * during response serialization, ensuring the actor handles the exception correctly.
+     *
+     * @author Utsav Patel
+     */
     @Test(expected = RuntimeException.class)
     public void testSerializeResponseFailure() {
         try (MockedConstruction<ObjectMapper> ignored = mockConstruction(ObjectMapper.class,
