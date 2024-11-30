@@ -40,6 +40,7 @@ public class ResponseModelTest {
         video.setFleschKincaidGradeLevel(9.4);
         video.setFleschReadingScore(75.8);
         response.getVideos().add(video);
+        response.setFromKeyword(true);
     }
 
     /**
@@ -55,6 +56,7 @@ public class ResponseModelTest {
         Assert.assertNotNull(response.getVideos());
         Assert.assertEquals(":-)", response.getSentiment());
         Assert.assertEquals(3, response.getVideos().size());
+        Assert.assertTrue(response.isFromKeyword());
     }
 
 

@@ -26,7 +26,9 @@ import javax.inject.Inject;
 
 import java.util.UUID;
 import java.util.concurrent.CompletionStage;
+
 import static akka.pattern.Patterns.ask;
+
 /**
  * @author Utsav Patel
  */
@@ -40,6 +42,7 @@ public class YouTubeController extends Controller {
     private final Form<SearchForm> searchForm;
     private final ActorRef supervisorActor;
     private final ActorRef videoServiceActor;
+
     @Inject
     public YouTubeController(YouTubeService youTubeService, FormFactory formFactory, VideoService videoService, ActorSystem actorSystem, Materializer materializer, WSClient wsClient, Config config) {
         this.youTubeService = youTubeService;
@@ -53,7 +56,7 @@ public class YouTubeController extends Controller {
         actorSystem.actorOf(TimeActor.getProps(), "timeActor");
         actorSystem.actorOf(DescriptionReadabilityActor.props(), "descriptionReadability");
         actorSystem.actorOf(SentimentAnalyzerActor.props(), "sentimentalAnalyzer");
-        this.videoServiceActor = actorSystem.actorOf(VideoServiceActor.props(this.wsClient,this.API_KEY), "videoActor");
+        this.videoServiceActor = actorSystem.actorOf(VideoServiceActor.props(this.wsClient, this.API_KEY), "videoActor");
         this.supervisorActor = actorSystem.actorOf(SupervisorActor.props(this.wsClient, API_KEY), "supervisor");
     }
 
@@ -79,6 +82,20 @@ public class YouTubeController extends Controller {
                 .thenApply(response -> ok(Json.toJson(response)));
     }
 
+    /**
+     * Creates a WebSocket endpoint that establishes a connection between a client and the server using an Akka actor.
+     *
+     * <p>This method sets up a WebSocket that:
+     * <ul>
+     *   <li>Generates a unique identifier (UUID) for the WebSocket connection.</li>
+     *   <li>Creates a WebSocket actor using the `WebSocketActor` class with the generated UUID.</li>
+     *   <li>Registers the WebSocket actor with a supervisor actor for connection management.</li>
+     *   <li>Uses Akka Streams' `ActorFlow` to manage the interaction between the WebSocket and the actor system.</li>
+     * </ul>
+     *
+     * @return a WebSocket that processes textual messages
+     * @author Utsav Patel
+     */
     public WebSocket ws() {
         return WebSocket.Text.accept(request -> ActorFlow.actorRef(
                 actorRef -> {
@@ -100,7 +117,7 @@ public class YouTubeController extends Controller {
      */
     public CompletionStage<Result> showVideoDetails(String videoId) {
 
-        return FutureConverters.asJava(ask(this.videoServiceActor,videoId,2000))
+        return FutureConverters.asJava(ask(this.videoServiceActor, videoId, 2000))
                 .thenApply(video -> ok(views.html.videoDetailsPage.render((Video) video)));
 //        return videoService.getVideoById(videoId)
 //                .thenApply(video -> ok(views.html.videoDetailsPage.render(video)));
@@ -143,6 +160,6 @@ public class YouTubeController extends Controller {
 
 
         return youTubeService.wordStatesVideos(keyword)
-                .thenApply(wordStats-> ok(views.html.wordStats.render(keyword, wordStats)));
+                .thenApply(wordStats -> ok(views.html.wordStats.render(keyword, wordStats)));
     }
 }

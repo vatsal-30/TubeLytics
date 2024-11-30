@@ -11,12 +11,26 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Test class for DescriptionReadabilityActor.
+ * <p>
+ * This class contains unit tests for various methods in the DescriptionReadabilityActor
+ * to validate their functionality, including readability calculations, sentence counting,
+ * word splitting, and syllable counting.
+ * </p>
+ *
+ * @author Utsav Patel
+ */
 public class DescriptionReadabilityActorTest {
 
     private static ActorSystem actorSystem;
     private final String TEXT = "In a quaint little village nestled between misty mountains and sprawling green fields, there was a peculiar shop that everyone called \"The Whispering Lantern.\" The shop appeared ordinary from the outside, with a simple wooden sign swaying gently in the breeze, but inside, it was anything but. Shelves brimmed with enchanted trinkets, ancient scrolls, and curious artifacts from distant lands. Visitors claimed that each item had a story to tell, and if you listened closely, you could hear faint whispers echoing through the lanterns hanging from the ceiling.";
     private Response response = null;
 
+    /**
+     * Sets up the test environment by initializing the Response object
+     * with sample data for testing.
+     */
     @Before
     public void setUp() {
         response = new Response();
@@ -31,17 +45,28 @@ public class DescriptionReadabilityActorTest {
         response.getVideos().add(video);
     }
 
+    /**
+     * Sets up the ActorSystem for testing.
+     */
     @BeforeClass
     public static void setup() {
         actorSystem = ActorSystem.create();
     }
 
+    /**
+     * Tears down the ActorSystem after all tests are executed.
+     */
     @AfterClass
     public static void teardown() {
         TestKit.shutdownActorSystem(actorSystem);
         actorSystem = null;
     }
 
+    /**
+     * Tests the readability calculation logic in the DescriptionReadabilityActor.
+     *
+     * @author Utsav Patel
+     */
     @Test
     public void testReadability() {
         final TestKit probe = new TestKit(actorSystem);
@@ -75,7 +100,7 @@ public class DescriptionReadabilityActorTest {
     }
 
     /**
-     * This method tests countSentences method.
+     * Tests the sentence counting functionality of the DescriptionReadabilityActor.
      *
      * @author Utsav Patel
      */
@@ -86,7 +111,7 @@ public class DescriptionReadabilityActorTest {
     }
 
     /**
-     * This method tests splitIntoWords method.
+     * Tests the word splitting functionality of the DescriptionReadabilityActor.
      *
      * @author Utsav Patel
      */
@@ -100,7 +125,7 @@ public class DescriptionReadabilityActorTest {
     }
 
     /**
-     * This method tests isConsonant method.
+     * Tests the consonant detection functionality of the DescriptionReadabilityActor.
      *
      * @author Utsav Patel
      */
@@ -111,7 +136,7 @@ public class DescriptionReadabilityActorTest {
     }
 
     /**
-     * This method tests countSyllables method.
+     * Tests the syllable counting functionality of the DescriptionReadabilityActor.
      *
      * @author Utsav Patel
      */
@@ -137,7 +162,7 @@ public class DescriptionReadabilityActorTest {
     }
 
     /**
-     * This method tests calculateReadabilityScores method.
+     * Tests the readability score calculation functionality of the DescriptionReadabilityActor.
      *
      * @author Utsav Patel
      */
