@@ -6,6 +6,7 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.stream.Materializer;
 import com.typesafe.config.Config;
+import model.Response;
 import model.SearchForm;
 import model.Video;
 import play.data.Form;
@@ -40,6 +41,7 @@ public class YouTubeController extends Controller {
     private final Form<SearchForm> searchForm;
     private final ActorRef supervisorActor;
     private final ActorRef videoServiceActor;
+    private final ActorRef taggedServiceActor;
     @Inject
     public YouTubeController(YouTubeService youTubeService, FormFactory formFactory, VideoService videoService, ActorSystem actorSystem, Materializer materializer, WSClient wsClient, Config config) {
         this.youTubeService = youTubeService;
@@ -49,6 +51,7 @@ public class YouTubeController extends Controller {
         this.materializer = materializer;
         this.wsClient = wsClient;
         this.API_KEY = config.getString("youtube.api.key");
+        this.taggedServiceActor =  actorSystem.actorOf(TaggedServiceActor.props(this.wsClient,this.API_KEY), "tagActor");
 //        VideoServiceActor = videoServiceActor;
         actorSystem.actorOf(TimeActor.getProps(), "timeActor");
         actorSystem.actorOf(DescriptionReadabilityActor.props(), "descriptionReadability");
@@ -112,8 +115,11 @@ public class YouTubeController extends Controller {
      * @author Yash Ajmeri
      */
     public CompletionStage<Result> searchTags(String searchTag) {
-        return youTubeService.searchVideos(searchTag)
-                .thenApply(response -> ok(views.html.taggedVideo.render(response)));
+        return FutureConverters.asJava(ask(this.taggedServiceActor,searchTag,2000))
+                .thenApply(response -> ok(views.html.taggedVideo.render((Response) response)));
+
+//        return youTubeService.searchVideos(searchTag)
+//                .thenApply(response -> ok(views.html.taggedVideo.render(response)));
     }
 
     /**
