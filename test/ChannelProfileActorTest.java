@@ -25,6 +25,17 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+
+/**
+ * Test class for the ChannelProfileActor.
+ * This class contains unit tests to verify the behavior of the ChannelProfileActor,
+ * including successful and failure cases for fetching channel profile and videos.
+ *
+ * Uses Akka TestKit for actor testing and Mockito for mocking external dependencies.
+ *
+ * @author Amish Navadia
+ */
+
 public class ChannelProfileActorTest {
 
     private static ActorSystem system;
@@ -35,17 +46,27 @@ public class ChannelProfileActorTest {
     private static final String YOUTUBE_CHANNEL_URL = "https://www.googleapis.com/youtube/v3/channels";
     private static final String YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search";
 
+    /**
+     * Sets up the ActorSystem before running the tests.
+     */
     @BeforeClass
     public static void setup() {
         system = ActorSystem.create();
     }
 
+    /**
+     * Shuts down the ActorSystem after running the tests.
+     */
     @AfterClass
     public static void teardown() {
         TestKit.shutdownActorSystem(system);
         system = null;
     }
-
+    /**
+     * Tests the success scenario of fetching a channel profile and its videos.
+     * Verifies that the fetched profile matches the mocked data.
+     * @author Amish Navadia
+     */
     @Test
     public void testFetchChannelProfileSuccess() {
         new TestKit(system) {{
@@ -116,6 +137,12 @@ public class ChannelProfileActorTest {
         }};
     }
 
+    /**
+     * Tests the failure scenario where fetching the channel profile fails.
+     * Verifies that the error message matches the simulated failure.
+     * @author Amish Navadia
+     */
+
     @Test
     public void testFetchChannelProfileFailure() {
         new TestKit(system) {{
@@ -144,6 +171,11 @@ public class ChannelProfileActorTest {
         }};
     }
 
+    /**
+     * Tests the failure scenario where fetching channel videos fails.
+     * Verifies that the error message matches the simulated failure.
+     * @author Amish Navadia
+     */
     @Test
     public void testFetchChannelVideosFailure() {
         new TestKit(system) {{
