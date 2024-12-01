@@ -7,6 +7,7 @@ import com.typesafe.config.Config;
 import model.Response;
 import model.SearchForm;
 import model.Video;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -17,6 +18,7 @@ import play.libs.Json;
 import play.libs.ws.WSClient;
 import play.mvc.Http;
 import play.mvc.Result;
+import play.mvc.WebSocket;
 import play.test.Helpers;
 import play.test.WithApplication;
 import services.VideoService;
@@ -167,5 +169,26 @@ public class YouTubeControllerTest extends WithApplication {
 
         Result result = route(app, request);
         assertEquals(OK, result.status());
+    }
+
+    @Test
+    public void wsTest() {
+        WebSocket ws = this.youTubeController.ws();
+        Assert.assertNotNull(ws);
+    }
+
+    @Test
+    public void searchTagsTest() {
+        CompletionStage<Result> tags = this.youTubeController.searchTags("Tags");
+    }
+
+    @Test
+    public void showVideoDetailsTest() {
+        CompletionStage<Result> videoDetails = this.youTubeController.showVideoDetails("Tags");
+    }
+
+    @Test
+    public void channelProfileTest() {
+        CompletionStage<Result> channelProfile = this.youTubeController.channelProfile("Tags");
     }
 }
