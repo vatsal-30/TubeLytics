@@ -47,7 +47,7 @@ public class UserActor extends AbstractActor {
                 .match(String.class, message -> {
                     if (!searchHistory.contains(message)) {
                         if (searchHistory.size() >= 10) {
-                            searchHistory.removeFirst();
+                            searchHistory.remove(0);
                         }
                         searchHistory.add(message);
                     } else {
