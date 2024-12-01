@@ -22,13 +22,22 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-akka-http-server" % akkaVersion,
   "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion,
   "com.typesafe.akka" %% "akka-serialization-jackson" % akkaVersion,
+  "com.typesafe.akka" %% "akka-testkit" % "2.9.5" % Test,
   javaWs,
 //  "ch.qos.logback" % "logback-classic" % "1.2.3",
   "junit" % "junit" % "4.13.1" % Test,
   "org.mockito" % "mockito-core" % "5.12.0" % Test,
+//  "org.mockito" % "mockito-inline" % "5.12.0" % Test,
+  "com.typesafe.play" %% "play-test" % "2.8.20" % Test,
+  "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test,
+  "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test,
+//  "com.typesafe" % "config" % "1.4.x"
+//  "com.fasterxml.jackson.core" % "jackson-databind" % "2.15.2" % Test
   "com.typesafe.akka" %% "akka-testkit" % "2.6.20" % Test) // Akka TestKit
-
 //libraryDependencies += "org.mockito" %% "mockito-inline" % "4.0.0" % Test
+libraryDependencies += "net.bytebuddy" % "byte-buddy" % "1.14.16" // or the latest available
+
+
 
 libraryDependencies := libraryDependencies.value.map(_.excludeAll(
   ExclusionRule("org.apache.pekko"),

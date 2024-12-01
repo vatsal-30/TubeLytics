@@ -19,7 +19,14 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.WebSocket;
+import scala.concurrent.ExecutionContextExecutor;
 import scala.jdk.javaapi.FutureConverters;
+import static akka.pattern.Patterns.ask;
+import akka.util.Timeout;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import services.YouTubeService;
 import services.VideoService;
@@ -27,6 +34,7 @@ import services.VideoService;
 import javax.inject.Inject;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 import static akka.pattern.Patterns.ask;
@@ -44,9 +52,9 @@ public class YouTubeController extends Controller {
     private final Form<SearchForm> searchForm;
     private final ActorRef supervisorActor;
     private final ActorRef videoServiceActor;
+    private final ActorRef wordStatsActor;
     private final ActorRef taggedServiceActor;
     private final ActorRef channelProfileActor;
-
     @Inject
     public YouTubeController(YouTubeService youTubeService, FormFactory formFactory, VideoService videoService, ActorSystem actorSystem, Materializer materializer, WSClient wsClient, Config config) {
         this.youTubeService = youTubeService;
@@ -63,6 +71,8 @@ public class YouTubeController extends Controller {
         this.channelProfileActor = actorSystem.actorOf(ChannelProfileActor.props(this.wsClient, this.API_KEY), "channelProfileActor");
         this.videoServiceActor = actorSystem.actorOf(VideoServiceActor.props(this.wsClient, this.API_KEY), "videoActor");
         this.supervisorActor = actorSystem.actorOf(SupervisorActor.props(this.wsClient, API_KEY), "supervisor");
+        this.wordStatsActor = actorSystem.actorOf(WordStatsActor.props(this.youTubeService), "wordStatsActor");
+
     }
 
 
@@ -163,9 +173,27 @@ public class YouTubeController extends Controller {
      * This will return the JSON response of the keyword and description of searched videos from that keywords and their frequency.
      *
      * @author Karan Tanakhia
+     * @param keyword The search keyword for which to fetch word statistics.
+     * @return `CompletionStage<Result>` containing either a successful response with word statistics or an error response.
      */
+
+
     public CompletionStage<Result> getWordStats(String keyword) {
-        return youTubeService.wordStatesVideos(keyword)
-                .thenApply(wordStats -> ok(views.html.wordStats.render(keyword, wordStats)));
+        if (keyword.trim().isEmpty()) {
+            return CompletableFuture.completedFuture(badRequest("Keyword cannot be empty"));
+        }
+
+        return FutureConverters.asJava(ask(this.wordStatsActor, keyword, 2000))
+                .thenApply(response -> {
+
+                    List<String> wordStats = (List<String>) response;
+                    return ok(views.html.wordStats.render(keyword, wordStats));
+
+                })
+                .exceptionally(ex -> {
+                    ex.printStackTrace();
+                    return internalServerError("Failed to fetch word statistics: " + ex.getMessage());
+                });
+
     }
 }

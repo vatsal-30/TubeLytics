@@ -175,6 +175,8 @@ public class YouTubeServiceImpl implements YouTubeService {
      * This method will fetch the videos from the YouTube API based on the provided keyword and then return the list of word and it's frequency from the all videos description .
      *
      * @author Karan Tanakhia
+     * @param keyword the search keyword for which to retrieve video descriptions
+     * @return CompletionStage<List<String>> a list of word statistics calculated from the video descriptions
      */
     @Override
     public CompletionStage<List<String>> wordStatesVideos(String keyword) {
@@ -198,6 +200,8 @@ public class YouTubeServiceImpl implements YouTubeService {
      * This method will generate list string which contains the unique words and it's frequency form all the videos description and sort according to the descending order.
      *
      * @author Karan Tanakhia
+     * @param descriptions the list of video descriptions to analyze
+     * @return List<String> a list of word statistics formatted as "word: count"
      */
     private List<String> calculateWordStats(List<String> descriptions) {
         Map<String, Long> wordCounts = descriptions.stream()
