@@ -6,12 +6,31 @@ import model.Response;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Actor to calculate readability scores for video descriptions.
+ * Processes messages of type {@link Response}, calculates readability metrics,
+ * and updates the response object with the calculated scores.
+ *
+ * @author Utsav Patel
+ */
 public class DescriptionReadabilityActor extends AbstractActor {
 
+    /**
+     * Creates a Props instance for {@link DescriptionReadabilityActor}.
+     *
+     * @return Props instance for this actor
+     * @author Utsav Patel
+     */
     public static Props props() {
         return Props.create(DescriptionReadabilityActor.class);
     }
 
+    /**
+     * Defines the behavior of the actor for handling messages.
+     *
+     * @return Receive instance defining message handling logic
+     * @author Utsav Patel
+     */
     @Override
     public Receive createReceive() {
         return receiveBuilder().match(Response.class, response -> {
@@ -20,6 +39,13 @@ public class DescriptionReadabilityActor extends AbstractActor {
         }).build();
     }
 
+    /**
+     * Calculates the readability scores for video descriptions in the given response.
+     * Updates the response object with average readability scores.
+     *
+     * @param response {@link Response} containing video descriptions
+     * @author Utsav Patel
+     */
     public void calculateDescriptionReadability(Response response) {
         AtomicReference<Double> fkg = new AtomicReference<>(0.0);
         AtomicReference<Double> frs = new AtomicReference<>(0.0);
@@ -37,12 +63,11 @@ public class DescriptionReadabilityActor extends AbstractActor {
     }
 
     /**
-     * This method will calculate the readability score.
-     * Flesch-Kincaid Grade Level
-     * Flesch Reading Score
+     * Calculates readability scores (Flesch-Kincaid Grade Level and Flesch Reading Score) for a given text.
      *
-     * @param description description of video
-     * @return double[] - It contains the readability score
+     * @param description the text to analyze
+     * @return an array of doubles where index 0 is the Flesch-Kincaid Grade Level
+     * and index 1 is the Flesch Reading Score
      * @author Utsav Patel
      */
     public static double[] calculateReadabilityScores(String description) {
@@ -68,10 +93,10 @@ public class DescriptionReadabilityActor extends AbstractActor {
     }
 
     /**
-     * This method will calculate Syllables of the word.
+     * Counts the number of syllables in a word.
      *
-     * @param word work of description
-     * @return count of syllables
+     * @param word the word to analyze
+     * @return the number of syllables in the word
      * @author Utsav Patel
      */
     public static int countSyllables(String word) {
@@ -116,10 +141,10 @@ public class DescriptionReadabilityActor extends AbstractActor {
     }
 
     /**
-     * This method will check whether it is consonant or not.
+     * Determines if a character is a consonant.
      *
-     * @param c character
-     * @return boolean
+     * @param c the character to check
+     * @return true if the character is a consonant, false otherwise
      * @author Utsav Patel
      */
     public static boolean isConsonant(char c) {
@@ -127,10 +152,10 @@ public class DescriptionReadabilityActor extends AbstractActor {
     }
 
     /**
-     * This method will split text into words
+     * Splits a text into an array of words.
      *
-     * @param text to split into words
-     * @return Array of String
+     * @param text the text to split
+     * @return an array of words
      * @author Utsav Patel
      */
     public static String[] splitIntoWords(String text) {
@@ -138,10 +163,10 @@ public class DescriptionReadabilityActor extends AbstractActor {
     }
 
     /**
-     * This method will count number of sentences.
+     * Counts the number of sentences in a text.
      *
-     * @param text to count number of sentences
-     * @return int - number of sentences
+     * @param text the text to analyze
+     * @return the number of sentences in the text
      * @author Utsav Patel
      */
     public static int countSentences(String text) {

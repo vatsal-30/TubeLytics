@@ -32,10 +32,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test,
   "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test,
 //  "com.typesafe" % "config" % "1.4.x"
-
-//  "org.awaitility" % "awaitility" % "4.2.0" % Test,
 //  "com.fasterxml.jackson.core" % "jackson-databind" % "2.15.2" % Test
-)
+  "com.typesafe.akka" %% "akka-testkit" % "2.6.20" % Test) // Akka TestKit
 //libraryDependencies += "org.mockito" %% "mockito-inline" % "4.0.0" % Test
 libraryDependencies += "net.bytebuddy" % "byte-buddy" % "1.14.16" // or the latest available
 

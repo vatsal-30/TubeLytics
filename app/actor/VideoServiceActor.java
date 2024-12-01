@@ -10,19 +10,49 @@ import play.libs.ws.WSClient;
 
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Actor responsible for fetching detailed information about a YouTube video.
+ * Communicates with the YouTube Data API to retrieve metadata for a given video ID
+ * and returns the result to the sender as a {@link Video} object.
+ *
+ * @author Yash Ajmeri
+ */
+
 public class VideoServiceActor extends AbstractActor {
 
     private final WSClient wsClient;
     private final String apiKey;
     private final String youtubeUrl = "https://www.googleapis.com/youtube/v3/videos";
 
+    /**
+     * Constructs a VideoServiceActor with the specified WSClient and API key.
+     *
+     * @param wsClient the Play WSClient used for making HTTP requests
+     * @param apiKey   the YouTube API key used for authentication
+     * @author Yash Ajmeri
+     */
+
     public VideoServiceActor(WSClient wsClient, String apiKey) {
         this.wsClient = wsClient;
         this.apiKey = apiKey;
     }
+    /**
+     * Factory method to create Props for this actor.
+     *
+     * @param wsClient the Play WSClient used for making HTTP requests
+     * @param apiKey   the YouTube API key used for authentication
+     * @return a Props instance for creating the actor
+     * @author Yash Ajmeri
+     */
     public static Props props(WSClient wsClient, String apiKey) {
         return Props.create(VideoServiceActor.class, () -> new VideoServiceActor( wsClient, apiKey));
     }
+    /**
+     * Defines the behavior of this actor.
+     *
+     * @return the Receive object defining the message handling behavior
+     * @author Yash Ajmeri
+     */
 
     @Override
     public Receive createReceive() {
@@ -30,6 +60,14 @@ public class VideoServiceActor extends AbstractActor {
                 .match(String.class, this::fetchVideoDetails)
                 .build();
     }
+
+    /**
+     * Fetches video details from the YouTube Data API for a given video ID.
+     * Sends the retrieved {@link Video} object back to the original sender.
+     *
+     * @param videoId the unique identifier for the YouTube video to fetch details for
+     * @author Yash Ajmeri
+     */
 
     public void fetchVideoDetails(String videoId) {
         ActorRef originalSender = sender();

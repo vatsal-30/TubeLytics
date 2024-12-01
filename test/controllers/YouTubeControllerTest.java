@@ -1,6 +1,9 @@
 package controllers;
 
+import akka.actor.ActorSystem;
+import akka.stream.Materializer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.typesafe.config.Config;
 import model.Response;
 import model.SearchForm;
 import model.Video;
@@ -11,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 import play.data.Form;
 import play.data.FormFactory;
 import play.libs.Json;
+import play.libs.ws.WSClient;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.test.Helpers;
@@ -48,6 +52,18 @@ public class YouTubeControllerTest extends WithApplication {
     @Mock
     private Form<SearchForm> searchForm;
 
+    @Mock
+    private ActorSystem actorSystem;
+
+    @Mock
+    private Materializer materializer;
+
+    @Mock
+    private WSClient wsClient;
+
+    @Mock
+    private Config config;
+
     private YouTubeController youTubeController;
 
     /**
@@ -59,7 +75,7 @@ public class YouTubeControllerTest extends WithApplication {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
         when(formFactory.form(SearchForm.class)).thenReturn(searchForm);
-        youTubeController = new YouTubeController(youTubeService, formFactory, videoService);
+        youTubeController = new YouTubeController(youTubeService, formFactory, videoService, actorSystem, materializer, wsClient, config);
 
         response = new Response();
         response.setQuery("Sample query about education and learning");

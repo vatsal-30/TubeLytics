@@ -6,6 +6,8 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.stream.Materializer;
 import com.typesafe.config.Config;
+import model.ChannelProfile;
+import model.Response;
 import model.SearchForm;
 import model.Video;
 import play.data.Form;
@@ -34,7 +36,9 @@ import javax.inject.Inject;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+
 import static akka.pattern.Patterns.ask;
+
 /**
  * @author Utsav Patel
  */
@@ -49,8 +53,8 @@ public class YouTubeController extends Controller {
     private final ActorRef supervisorActor;
     private final ActorRef videoServiceActor;
     private final ActorRef wordStatsActor;
-
-//    private static final Timeout TIMEOUT = Timeout.apply(5, TimeUnit.SECONDS);
+    private final ActorRef taggedServiceActor;
+    private final ActorRef channelProfileActor;
     @Inject
     public YouTubeController(YouTubeService youTubeService, FormFactory formFactory, VideoService videoService, ActorSystem actorSystem, Materializer materializer, WSClient wsClient, Config config) {
         this.youTubeService = youTubeService;
@@ -60,14 +64,17 @@ public class YouTubeController extends Controller {
         this.materializer = materializer;
         this.wsClient = wsClient;
         this.API_KEY = config.getString("youtube.api.key");
-//        VideoServiceActor = videoServiceActor;
+        this.taggedServiceActor = actorSystem.actorOf(TaggedServiceActor.props(this.wsClient, this.API_KEY), "tagActor");
         actorSystem.actorOf(TimeActor.getProps(), "timeActor");
         actorSystem.actorOf(DescriptionReadabilityActor.props(), "descriptionReadability");
-        this.videoServiceActor = actorSystem.actorOf(VideoServiceActor.props(this.wsClient,this.API_KEY), "videoActor");
+        actorSystem.actorOf(SentimentAnalyzerActor.props(), "sentimentalAnalyzer");
+        this.channelProfileActor = actorSystem.actorOf(ChannelProfileActor.props(this.wsClient, this.API_KEY), "channelProfileActor");
+        this.videoServiceActor = actorSystem.actorOf(VideoServiceActor.props(this.wsClient, this.API_KEY), "videoActor");
         this.supervisorActor = actorSystem.actorOf(SupervisorActor.props(this.wsClient, API_KEY), "supervisor");
         this.wordStatsActor = actorSystem.actorOf(WordStatsActor.props(this.youTubeService), "wordStatsActor");
 
     }
+
 
     /**
      * This method will render the index page, which contains a search field.
@@ -91,6 +98,20 @@ public class YouTubeController extends Controller {
                 .thenApply(response -> ok(Json.toJson(response)));
     }
 
+    /**
+     * Creates a WebSocket endpoint that establishes a connection between a client and the server using an Akka actor.
+     *
+     * <p>This method sets up a WebSocket that:
+     * <ul>
+     *   <li>Generates a unique identifier (UUID) for the WebSocket connection.</li>
+     *   <li>Creates a WebSocket actor using the `WebSocketActor` class with the generated UUID.</li>
+     *   <li>Registers the WebSocket actor with a supervisor actor for connection management.</li>
+     *   <li>Uses Akka Streams' `ActorFlow` to manage the interaction between the WebSocket and the actor system.</li>
+     * </ul>
+     *
+     * @return a WebSocket that processes textual messages
+     * @author Utsav Patel
+     */
     public WebSocket ws() {
         return WebSocket.Text.accept(request -> ActorFlow.actorRef(
                 actorRef -> {
@@ -112,10 +133,10 @@ public class YouTubeController extends Controller {
      */
     public CompletionStage<Result> showVideoDetails(String videoId) {
 
-        return FutureConverters.asJava(ask(this.videoServiceActor,videoId,2000))
+        return FutureConverters.asJava(ask(this.videoServiceActor, videoId, 2000))
                 .thenApply(video -> ok(views.html.videoDetailsPage.render((Video) video)));
-//        return videoService.getVideoById(videoId)
-//                .thenApply(video -> ok(views.html.videoDetailsPage.render(video)));
+        //        return videoService.getVideoById(videoId)
+        //                .thenApply(video -> ok(views.html.videoDetailsPage.render(video)));
     }
 
     /**
@@ -124,8 +145,8 @@ public class YouTubeController extends Controller {
      * @author Yash Ajmeri
      */
     public CompletionStage<Result> searchTags(String searchTag) {
-        return youTubeService.searchVideos(searchTag)
-                .thenApply(response -> ok(views.html.taggedVideo.render(response)));
+        return FutureConverters.asJava(ask(this.taggedServiceActor, searchTag, 2000))
+                .thenApply(response -> ok(views.html.taggedVideo.render((Response) response)));
     }
 
     /**
@@ -136,14 +157,16 @@ public class YouTubeController extends Controller {
     // Method to get channel profile
     public CompletionStage<Result> channelProfile(String channelId) {
 
-        return youTubeService.getChannelProfile(channelId) // Fetch channel profile
-                .thenCompose(channelProfile -> {
-                    return youTubeService.getChannelVideos(channelId, 10) // Fetch the 10 latest videos
-                            .thenApply(videos -> {
-                                channelProfile.setVideos(videos);  // Add videos to the channel profile
-                                return ok(views.html.channelProfile.render(channelProfile)); // Pass to the view
-                            });
-                });
+        return FutureConverters.asJava(ask(this.channelProfileActor, new ChannelProfileActor.Channel(channelId), 2000))
+                .thenApply(channelProfile -> ok(views.html.channelProfile.render((ChannelProfile) channelProfile)));
+//        return youTubeService.getChannelProfile(channelId) // Fetch channel profile
+//                .thenCompose(channelProfile -> {
+//                    return youTubeService.getChannelVideos(channelId, 10) // Fetch the 10 latest videos
+//                            .thenApply(videos -> {
+//                                channelProfile.setVideos(videos);  // Add videos to the channel profile
+//                                return ok(views.html.channelProfile.render(channelProfile)); // Pass to the view
+//                            });
+//                });
     }
 
     /**
